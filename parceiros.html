@@ -1,0 +1,560 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Parceiros — MB Hub</title>
+  <style>
+    :root {
+      --bg: #ffffff;
+      --surface: #f8f9fa;
+      --fg: #1a1a1a;
+      --muted: #6b7280;
+      --border: #e5e7eb;
+      --accent: #ca8c3f;
+      --accent-secondary: #141352;
+      --radius: 8px;
+      --font: 'Astra', system-ui, -apple-system, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { height: 100%; }
+    body {
+      min-height: 100%;
+      font-family: var(--font);
+      font-size: 15px;
+      line-height: 1.5;
+      color: var(--fg);
+      background: var(--surface);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Layout */
+    .app { display: flex; min-height: 100vh; }
+    .sidebar {
+      width: 240px;
+      background: var(--bg);
+      border-right: 1px solid var(--border);
+      padding: 24px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 32px;
+      flex-shrink: 0;
+    }
+    .main {
+      flex: 1;
+      padding: 24px;
+      overflow-x: hidden;
+    }
+
+    /* Sidebar */
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 8px;
+    }
+    .brand-logo {
+      width: 80px;
+      height: auto;
+    }
+    .brand h1 {
+      font-size: 18px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+    }
+
+    .nav { display: flex; flex-direction: column; gap: 4px; }
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 12px;
+      color: var(--fg);
+      text-decoration: none;
+      border-radius: var(--radius);
+      font-size: 14px;
+      font-weight: 500;
+      transition: background 0.15s;
+    }
+    .nav-item:hover { background: var(--surface); }
+    .nav-item.active {
+      background: var(--surface);
+      color: var(--accent);
+    }
+    .nav-icon {
+      width: 20px;
+      height: 20px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2;
+    }
+
+    .user {
+      margin-top: auto;
+      padding: 12px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .user-avatar {
+      width: 36px;
+      height: 36px;
+      background: var(--accent);
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      color: var(--bg);
+      font-weight: 600;
+      font-size: 14px;
+    }
+    .user-info {
+      flex: 1;
+      min-width: 0;
+    }
+    .user-name {
+      font-size: 14px;
+      font-weight: 500;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .user-role {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    /* Header */
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 32px;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .header h2 {
+      font-size: 28px;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+    }
+    .btn-primary {
+      padding: 10px 20px;
+      background: var(--accent);
+      color: var(--bg);
+      border: 1px solid var(--accent);
+      border-radius: var(--radius);
+      font-family: var(--font);
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: filter 0.15s;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .btn-primary:hover {
+      filter: brightness(0.95);
+    }
+
+    /* Grid de Parceiros */
+    .parceiros-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .parceiro-card {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      transition: box-shadow 0.15s, border-color 0.15s;
+    }
+    .parceiro-card:hover {
+      border-color: var(--accent);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+    }
+
+    .parceiro-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    .parceiro-avatar {
+      width: 48px;
+      height: 48px;
+      background: var(--surface);
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--accent);
+    }
+    .parceiro-info {
+      flex: 1;
+      min-width: 0;
+    }
+    .parceiro-nome {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 2px;
+    }
+    .parceiro-email {
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .parceiro-stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 16px;
+      padding-top: 16px;
+      border-top: 1px solid var(--border);
+    }
+    .parceiro-stat {
+      text-align: center;
+    }
+    .parceiro-stat-value {
+      font-size: 20px;
+      font-weight: 600;
+      color: var(--accent);
+      font-variant-numeric: tabular-nums;
+    }
+    .parceiro-stat-label {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    .parceiro-actions {
+      display: flex;
+      gap: 8px;
+    }
+    .btn-secondary {
+      flex: 1;
+      padding: 8px 12px;
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      font-family: var(--font);
+      font-size: 13px;
+      color: var(--fg);
+      cursor: pointer;
+      transition: all 0.15s;
+      text-align: center;
+    }
+    .btn-secondary:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 500;
+      white-space: nowrap;
+    }
+    .badge.ativo {
+      background: #d1fae5;
+      color: #065f46;
+    }
+    .badge.inativo {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    /* Modal */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 1000;
+      padding: 24px;
+      overflow-y: auto;
+    }
+    .modal.open {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal-content {
+      background: var(--bg);
+      border-radius: var(--radius);
+      max-width: 480px;
+      width: 100%;
+      padding: 24px;
+    }
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+    .modal-header h3 {
+      font-size: 20px;
+      font-weight: 600;
+    }
+    .modal-close {
+      width: 32px;
+      height: 32px;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+      color: var(--muted);
+      border-radius: 4px;
+      transition: background 0.15s;
+    }
+    .modal-close:hover {
+      background: var(--surface);
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+    .form-label {
+      display: block;
+      font-size: 14px;
+      font-weight: 500;
+      margin-bottom: 6px;
+      color: var(--fg);
+    }
+    .form-input {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      font-family: var(--font);
+      font-size: 14px;
+      color: var(--fg);
+      background: var(--bg);
+    }
+    .form-input:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+
+    .modal-footer {
+      display: flex;
+      gap: 12px;
+      justify-content: flex-end;
+      margin-top: 24px;
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="brand">
+        <img src="mr2km39w-IMG_3972.jpg" alt="MB Hub" class="brand-logo">
+        <h1>MB Hub</h1>
+      </div>
+
+      <nav class="nav">
+        <a href="dashboard.html" class="nav-item">
+          <svg class="nav-icon" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+          Dashboard
+        </a>
+        <a href="pipeline.html" class="nav-item">
+          <svg class="nav-icon" viewBox="0 0 24 24"><path d="M3 3h7v18H3z"/><path d="M14 3h7v9h-7z"/></svg>
+          Funil de Leads
+        </a>
+        <a href="clientes.html" class="nav-item">
+          <svg class="nav-icon" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          Clientes
+        </a>
+        <a href="comissoes.html" class="nav-item">
+          <svg class="nav-icon" viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+          Comissões
+        </a>
+        <a href="parceiros.html" class="nav-item active">
+          <svg class="nav-icon" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><path d="M20 8v6M23 11h-6"/></svg>
+          Parceiros
+        </a>
+        <a href="lead-detail.html" class="nav-item">
+          <svg class="nav-icon" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          Novo Lead
+        </a>
+      </nav>
+
+      <div class="user">
+        <div class="user-avatar">MB</div>
+        <div class="user-info">
+          <div class="user-name">Márcia Braga</div>
+          <div class="user-role">Administrador</div>
+        </div>
+      </div>
+    </aside>
+
+    <main class="main">
+      <div class="header">
+        <h2>Parceiros</h2>
+        <button class="btn-primary" onclick="abrirModalNovoParceiro()">
+          <svg style="width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2;" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+          Adicionar Parceiro
+        </button>
+      </div>
+
+      <div class="parceiros-grid">
+        <div class="parceiro-card">
+          <div class="parceiro-header">
+            <div class="parceiro-avatar">JS</div>
+            <div class="parceiro-info">
+              <div class="parceiro-nome">João Silva <span class="badge ativo">Ativo</span></div>
+              <div class="parceiro-email">joao.silva@parceiro.com</div>
+            </div>
+          </div>
+          <div class="parceiro-stats">
+            <div class="parceiro-stat">
+              <div class="parceiro-stat-value">12</div>
+              <div class="parceiro-stat-label">Leads</div>
+            </div>
+            <div class="parceiro-stat">
+              <div class="parceiro-stat-value">4.5%</div>
+              <div class="parceiro-stat-label">Comissão</div>
+            </div>
+          </div>
+          <div class="parceiro-actions">
+            <button class="btn-secondary">Editar</button>
+            <button class="btn-secondary">Comissões</button>
+          </div>
+        </div>
+
+        <div class="parceiro-card">
+          <div class="parceiro-header">
+            <div class="parceiro-avatar">MF</div>
+            <div class="parceiro-info">
+              <div class="parceiro-nome">Maria Fernandes <span class="badge ativo">Ativo</span></div>
+              <div class="parceiro-email">maria.f@parceiro.com</div>
+            </div>
+          </div>
+          <div class="parceiro-stats">
+            <div class="parceiro-stat">
+              <div class="parceiro-stat-value">8</div>
+              <div class="parceiro-stat-label">Leads</div>
+            </div>
+            <div class="parceiro-stat">
+              <div class="parceiro-stat-value">5.0%</div>
+              <div class="parceiro-stat-label">Comissão</div>
+            </div>
+          </div>
+          <div class="parceiro-actions">
+            <button class="btn-secondary">Editar</button>
+            <button class="btn-secondary">Comissões</button>
+          </div>
+        </div>
+
+        <div class="parceiro-card">
+          <div class="parceiro-header">
+            <div class="parceiro-avatar">PA</div>
+            <div class="parceiro-info">
+              <div class="parceiro-nome">Pedro Alves <span class="badge inativo">Inativo</span></div>
+              <div class="parceiro-email">pedro.alves@parceiro.com</div>
+            </div>
+          </div>
+          <div class="parceiro-stats">
+            <div class="parceiro-stat">
+              <div class="parceiro-stat-value">3</div>
+              <div class="parceiro-stat-label">Leads</div>
+            </div>
+            <div class="parceiro-stat">
+              <div class="parceiro-stat-value">4.0%</div>
+              <div class="parceiro-stat-label">Comissão</div>
+            </div>
+          </div>
+          <div class="parceiro-actions">
+            <button class="btn-secondary">Editar</button>
+            <button class="btn-secondary">Comissões</button>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Modal Novo Parceiro -->
+  <div class="modal" id="modal-parceiro">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Adicionar Parceiro</h3>
+        <button class="modal-close" onclick="fecharModalParceiro()">✕</button>
+      </div>
+
+      <form onsubmit="salvarParceiro(event)">
+        <div class="form-group">
+          <label class="form-label">Nome Completo</label>
+          <input type="text" class="form-input" id="parceiro-nome" placeholder="Nome do parceiro" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">E-mail</label>
+          <input type="email" class="form-input" id="parceiro-email" placeholder="email@parceiro.com" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Telefone</label>
+          <input type="tel" class="form-input" id="parceiro-telefone" placeholder="(11) 98765-4321">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">% Comissão</label>
+          <input type="number" class="form-input" id="parceiro-comissao" min="0" max="100" step="0.1" placeholder="4.5" required>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn-secondary" onclick="fecharModalParceiro()">Cancelar</button>
+          <button type="submit" class="btn-primary">Salvar Parceiro</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    function abrirModalNovoParceiro() {
+      document.getElementById('modal-parceiro').classList.add('open');
+    }
+
+    function fecharModalParceiro() {
+      document.getElementById('modal-parceiro').classList.remove('open');
+      document.querySelector('#modal-parceiro form').reset();
+    }
+
+    function salvarParceiro(event) {
+      event.preventDefault();
+
+      const nome = document.getElementById('parceiro-nome').value;
+      const email = document.getElementById('parceiro-email').value;
+      const telefone = document.getElementById('parceiro-telefone').value;
+      const comissao = document.getElementById('parceiro-comissao').value;
+
+      // Em produção, salvaria no backend
+      console.log('Novo parceiro:', { nome, email, telefone, comissao });
+
+      alert(`Parceiro cadastrado com sucesso!\n\nNome: ${nome}\nComissão: ${comissao}%`);
+
+      fecharModalParceiro();
+    }
+
+    // Fechar modal ao clicar fora
+    document.getElementById('modal-parceiro').addEventListener('click', function(e) {
+      if (e.target === this) {
+        fecharModalParceiro();
+      }
+    });
+  </script>
+  <script src="auth.js"></script>
+</body>
+</html>

@@ -1,0 +1,779 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Comissões — MB Hub</title>
+  <style>
+    :root {
+      --bg: #ffffff;
+      --surface: #f8f9fa;
+      --fg: #1a1a1a;
+      --muted: #6b7280;
+      --border: #e5e7eb;
+      --accent: #ca8c3f;
+      --accent-secondary: #141352;
+      --radius: 8px;
+      --font: 'Astra', system-ui, -apple-system, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { height: 100%; }
+    body {
+      min-height: 100%;
+      font-family: var(--font);
+      font-size: 15px;
+      line-height: 1.5;
+      color: var(--fg);
+      background: var(--surface);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Layout */
+    .app { display: flex; min-height: 100vh; }
+    .sidebar {
+      width: 240px;
+      background: var(--bg);
+      border-right: 1px solid var(--border);
+      padding: 24px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 32px;
+      flex-shrink: 0;
+    }
+    .main {
+      flex: 1;
+      padding: 24px;
+      overflow-x: hidden;
+    }
+
+    /* Sidebar */
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 8px;
+    }
+    .brand-logo {
+      width: 80px;
+      height: auto;
+    }
+    .brand h1 {
+      font-size: 18px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+    }
+
+    .nav { display: flex; flex-direction: column; gap: 4px; }
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 12px;
+      color: var(--fg);
+      text-decoration: none;
+      border-radius: var(--radius);
+      font-size: 14px;
+      font-weight: 500;
+      transition: background 0.15s;
+    }
+    .nav-item:hover { background: var(--surface); }
+    .nav-item.active {
+      background: var(--surface);
+      color: var(--accent);
+    }
+    .nav-icon {
+      width: 20px;
+      height: 20px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2;
+    }
+
+    .user {
+      margin-top: auto;
+      padding: 12px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .user-avatar {
+      width: 36px;
+      height: 36px;
+      background: var(--accent);
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      color: var(--bg);
+      font-weight: 600;
+      font-size: 14px;
+    }
+    .user-info {
+      flex: 1;
+      min-width: 0;
+    }
+    .user-name {
+      font-size: 14px;
+      font-weight: 500;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .user-role {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    /* Header */
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 32px;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .header h2 {
+      font-size: 28px;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+    }
+
+    /* Resumo de comissões */
+    .resumo-comissoes {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    .resumo-card {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+    }
+    .resumo-card .label {
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 8px;
+      letter-spacing: 0.02em;
+    }
+    .resumo-card .value {
+      font-size: 32px;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      color: var(--accent);
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* Filtros */
+    .filtros {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      margin-bottom: 24px;
+      display: flex;
+      gap: 16px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .filtros label {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--fg);
+    }
+    .filtros select {
+      padding: 8px 12px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      font-family: var(--font);
+      font-size: 14px;
+      color: var(--fg);
+      background: var(--bg);
+      cursor: pointer;
+    }
+    .filtros select:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+    .btn {
+      padding: 8px 16px;
+      background: var(--accent);
+      color: var(--bg);
+      border: 1px solid var(--accent);
+      border-radius: var(--radius);
+      font-family: var(--font);
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: filter 0.15s;
+    }
+    .btn:hover {
+      filter: brightness(0.95);
+    }
+
+    /* Table */
+    .table-container {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+
+    .table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .table thead {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .table th {
+      padding: 12px 16px;
+      text-align: left;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .table td {
+      padding: 16px;
+      border-bottom: 1px solid var(--border);
+      font-size: 14px;
+    }
+
+    .table tbody tr:last-child td {
+      border-bottom: none;
+    }
+
+    .table tbody tr:hover {
+      background: var(--surface);
+    }
+
+    .value-cell {
+      font-weight: 600;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .comissao-input {
+      width: 80px;
+      padding: 6px 10px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      font-family: var(--font);
+      font-size: 14px;
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+    .comissao-input:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+
+    .comissao-value {
+      font-weight: 600;
+      color: var(--accent);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 500;
+      white-space: nowrap;
+    }
+    .badge.pago {
+      background: #d1fae5;
+      color: #065f46;
+    }
+    .badge.pendente {
+      background: #fef3c7;
+      color: #92400e;
+    }
+
+    .comissao-flag {
+      width: 18px;
+      height: 18px;
+      cursor: pointer;
+      accent-color: var(--accent);
+    }
+
+    .status-select {
+      padding: 6px 10px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      font-family: var(--font);
+      font-size: 13px;
+      color: var(--fg);
+      background: var(--bg);
+      cursor: pointer;
+    }
+    .status-select:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+
+    .data-recebimento {
+      padding: 6px 10px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      font-family: var(--font);
+      font-size: 13px;
+      color: var(--fg);
+      background: var(--bg);
+      cursor: pointer;
+    }
+    .data-recebimento:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+    .data-recebimento:disabled {
+      background: var(--surface);
+      cursor: not-allowed;
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="brand">
+        <img src="mr2km39w-IMG_3972.jpg" alt="MB Hub" class="brand-logo">
+        <h1>MB Hub</h1>
+      </div>
+
+      <nav class="nav">
+        <a href="dashboard.html" class="nav-item">
+          <svg class="nav-icon" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+          Dashboard
+        </a>
+        <a href="pipeline.html" class="nav-item">
+          <svg class="nav-icon" viewBox="0 0 24 24"><path d="M3 3h7v18H3z"/><path d="M14 3h7v9h-7z"/></svg>
+          Funil de Leads
+        </a>
+        <a href="clientes.html" class="nav-item">
+          <svg class="nav-icon" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          Clientes
+        </a>
+        <a href="comissoes.html" class="nav-item active">
+          <svg class="nav-icon" viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+          Comissões
+        </a>
+        <a href="parceiros.html" class="nav-item">
+          <svg class="nav-icon" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><path d="M20 8v6M23 11h-6"/></svg>
+          Parceiros
+        </a>
+        <a href="lead-detail.html" class="nav-item">
+          <svg class="nav-icon" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          Novo Lead
+        </a>
+      </nav>
+
+      <div class="user">
+        <div class="user-avatar">MB</div>
+        <div class="user-info">
+          <div class="user-name">Márcia Braga</div>
+          <div class="user-role">Administrador</div>
+        </div>
+      </div>
+    </aside>
+
+    <main class="main">
+      <div class="header">
+        <h2>Comissões</h2>
+      </div>
+
+      <div class="resumo-comissoes">
+        <div class="resumo-card">
+          <div class="label">Total Liberado (Mês)</div>
+          <div class="value">R$ 820.000</div>
+        </div>
+        <div class="resumo-card">
+          <div class="label">Total Comissões (Mês)</div>
+          <div class="value">R$ 41.000</div>
+        </div>
+        <div class="resumo-card">
+          <div class="label">Comissões Pendentes</div>
+          <div class="value">R$ 18.000</div>
+        </div>
+      </div>
+
+      <div class="filtros">
+        <label for="periodo">Período:</label>
+        <select id="periodo">
+          <option value="mes-atual">Mês Atual (Jul/2026)</option>
+          <option value="mes-anterior">Mês Anterior (Jun/2026)</option>
+          <option value="trimestre">Último Trimestre</option>
+          <option value="ano">Ano (2026)</option>
+          <option value="personalizado">Personalizado</option>
+        </select>
+
+        <label for="consultor">Consultor:</label>
+        <select id="consultor">
+          <option value="todos">Todos</option>
+          <option value="marcia">Márcia Braga</option>
+          <option value="usuario1">Usuário 1</option>
+          <option value="usuario2">Usuário 2</option>
+          <option value="usuario3">Usuário 3</option>
+        </select>
+
+        <button class="btn" onclick="gerarRelatorio()">Gerar Relatório</button>
+      </div>
+
+      <div class="table-container">
+        <table class="table">
+          <thead>
+            <tr>
+              <th style="width: 30px;"></th>
+              <th>Cliente</th>
+              <th>Produto</th>
+              <th>Banco</th>
+              <th>Valor Liberado</th>
+              <th>% Comissão</th>
+              <th>Valor Comissão</th>
+              <th>Consultor</th>
+              <th>Status</th>
+              <th>Data Recebimento</th>
+              <th>Data Original</th>
+            </tr>
+          </thead>
+          <tbody id="comissoes-table-body">
+            <tr>
+              <td><input type="checkbox" class="comissao-flag" data-id="1"></td>
+              <td>Ana Maria Santos</td>
+              <td>Crédito Pessoal</td>
+              <td>Banco do Brasil</td>
+              <td class="value-cell">R$ 15.000</td>
+              <td>
+                <input type="number" class="comissao-input" value="5.0" min="0" max="100" step="0.1" onchange="calcularComissao(this)">%
+              </td>
+              <td class="comissao-value">R$ 750</td>
+              <td>Márcia Braga</td>
+              <td><select class="status-select" data-id="1"><option value="pago">Pago</option><option value="pendente">Pendente</option></select></td>
+              <td><input type="date" class="data-recebimento" data-id="1" value="2026-06-24"></td>
+              <td>24/06/2026</td>
+            </tr>
+            <tr>
+              <td><input type="checkbox" class="comissao-flag" data-id="2"></td>
+              <td>Carlos Silva</td>
+              <td>Consórcio Automóvel</td>
+              <td>Itaú</td>
+              <td class="value-cell">R$ 45.000</td>
+              <td><input type="number" class="comissao-input" value="4.5" min="0" max="100" step="0.1" onchange="calcularComissao(this)">%</td>
+              <td class="comissao-value">R$ 2.025</td>
+              <td>Márcia Braga</td>
+              <td><select class="status-select" data-id="2"><option value="pago" selected>Pago</option><option value="pendente">Pendente</option></select></td>
+              <td><input type="date" class="data-recebimento" data-id="2" value="2026-06-23"></td>
+              <td>23/06/2026</td>
+            </tr>
+            <tr>
+              <td><input type="checkbox" class="comissao-flag" data-id="3"></td>
+              <td>Mariana Oliveira</td>
+              <td>Financiamento Imobiliário</td>
+              <td>Caixa Econômica</td>
+              <td class="value-cell">R$ 280.000</td>
+              <td><input type="number" class="comissao-input" value="3.0" min="0" max="100" step="0.1" onchange="calcularComissao(this)">%</td>
+              <td class="comissao-value">R$ 8.400</td>
+              <td>Márcia Braga</td>
+              <td><select class="status-select" data-id="3"><option value="pago">Pago</option><option value="pendente" selected>Pendente</option></select></td>
+              <td><input type="date" class="data-recebimento" data-id="3"></td>
+              <td>20/06/2026</td>
+            </tr>
+            <tr>
+              <td><input type="checkbox" class="comissao-flag" data-id="4"></td>
+              <td>Roberto Pereira</td>
+              <td>Carta Contemplada</td>
+              <td>Santander</td>
+              <td class="value-cell">R$ 80.000</td>
+              <td><input type="number" class="comissao-input" value="4.0" min="0" max="100" step="0.1" onchange="calcularComissao(this)">%</td>
+              <td class="comissao-value">R$ 3.200</td>
+              <td>Usuário 1</td>
+              <td><select class="status-select" data-id="4"><option value="pago" selected>Pago</option><option value="pendente">Pendente</option></select></td>
+              <td><input type="date" class="data-recebimento" data-id="4" value="2026-06-18"></td>
+              <td>18/06/2026</td>
+            </tr>
+            <tr>
+              <td><input type="checkbox" class="comissao-flag" data-id="5"></td>
+              <td>Julia Costa</td>
+              <td>Consórcio Imóvel</td>
+              <td>Bradesco</td>
+              <td class="value-cell">R$ 200.000</td>
+              <td><input type="number" class="comissao-input" value="3.5" min="0" max="100" step="0.1" onchange="calcularComissao(this)">%</td>
+              <td class="comissao-value">R$ 7.000</td>
+              <td>Usuário 2</td>
+              <td><select class="status-select" data-id="5"><option value="pago">Pago</option><option value="pendente" selected>Pendente</option></select></td>
+              <td><input type="date" class="data-recebimento" data-id="5"></td>
+              <td>15/06/2026</td>
+            </tr>
+            <tr>
+              <td><input type="checkbox" class="comissao-flag" data-id="6"></td>
+              <td>Fernando Santos</td>
+              <td>Crédito Pessoal</td>
+              <td>Inter</td>
+              <td class="value-cell">R$ 12.000</td>
+              <td><input type="number" class="comissao-input" value="5.0" min="0" max="100" step="0.1" onchange="calcularComissao(this)">%</td>
+              <td class="comissao-value">R$ 600</td>
+              <td>Usuário 3</td>
+              <td><select class="status-select" data-id="6"><option value="pago" selected>Pago</option><option value="pendente">Pendente</option></select></td>
+              <td><input type="date" class="data-recebimento" data-id="6" value="2026-06-14"></td>
+              <td>14/06/2026</td>
+            </tr>
+            <tr>
+              <td><input type="checkbox" class="comissao-flag" data-id="7"></td>
+              <td>Lucia Cardoso</td>
+              <td>Consórcio Serviços</td>
+              <td>Sicoob</td>
+              <td class="value-cell">R$ 35.000</td>
+              <td><input type="number" class="comissao-input" value="4.0" min="0" max="100" step="0.1" onchange="calcularComissao(this)">%</td>
+              <td class="comissao-value">R$ 1.400</td>
+              <td>Márcia Braga</td>
+              <td><select class="status-select" data-id="7"><option value="pago">Pago</option><option value="pendente" selected>Pendente</option></select></td>
+              <td><input type="date" class="data-recebimento" data-id="7"></td>
+              <td>12/06/2026</td>
+            </tr>
+            <tr>
+              <td><input type="checkbox" class="comissao-flag" data-id="8"></td>
+              <td>Paulo Martins</td>
+              <td>Financiamento Imobiliário</td>
+              <td>Santander</td>
+              <td class="value-cell">R$ 320.000</td>
+              <td><input type="number" class="comissao-input" value="3.0" min="0" max="100" step="0.1" onchange="calcularComissao(this)">%</td>
+              <td class="comissao-value">R$ 9.600</td>
+              <td>Márcia Braga</td>
+              <td><select class="status-select" data-id="8"><option value="pago" selected>Pago</option><option value="pendente">Pendente</option></select></td>
+              <td><input type="date" class="data-recebimento" data-id="8" value="2026-06-10"></td>
+              <td>10/06/2026</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    // Salva estado das comissões no localStorage
+    function salvarComissoes() {
+      const comissoes = [];
+      document.querySelectorAll('#comissoes-table-body tr').forEach((row, idx) => {
+        const checkbox = row.querySelector('.comissao-flag');
+        const status = row.querySelector('.status-select');
+        const dataRec = row.querySelector('.data-recebimento');
+        const id = checkbox.dataset.id;
+
+        comissoes.push({
+          id,
+          marcado: checkbox.checked,
+          status: status.value,
+          dataRecebimento: dataRec.value
+        });
+      });
+      localStorage.setItem('mb_hub_comissoes', JSON.stringify(comissoes));
+    }
+
+    // Carrega estado das comissões
+    function carregarComissoes() {
+      const stored = localStorage.getItem('mb_hub_comissoes');
+      if (!stored) return;
+
+      try {
+        const comissoes = JSON.parse(stored);
+        comissoes.forEach(com => {
+          const checkbox = document.querySelector(`.comissao-flag[data-id="${com.id}"]`);
+          const status = document.querySelector(`.status-select[data-id="${com.id}"]`);
+          const dataRec = document.querySelector(`.data-recebimento[data-id="${com.id}"]`);
+
+          if (checkbox) checkbox.checked = com.marcado;
+          if (status) status.value = com.status;
+          if (dataRec) dataRec.value = com.dataRecebimento || '';
+        });
+      } catch (e) {
+        console.error('Erro ao carregar comissões:', e);
+      }
+    }
+
+    // Calcula comissão ao alterar %
+    function calcularComissao(input) {
+      if (!auth.isAdmin()) {
+        alert('Apenas administrador pode alterar a comissão');
+        input.value = input.defaultValue;
+        return;
+      }
+
+      const row = input.closest('tr');
+      const valorLiberado = parseFloat(row.querySelector('.value-cell').textContent.replace('R$ ', '').replace('.', '').replace(',', '.'));
+      const percentual = parseFloat(input.value);
+      const comissao = (valorLiberado * percentual / 100);
+
+      const comissaoCell = row.querySelector('.comissao-value');
+      comissaoCell.textContent = `R$ ${comissao.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+
+      salvarComissoes();
+      console.log(`Comissão atualizada: ${percentual}% = R$ ${comissao.toFixed(2)}`);
+    }
+
+    // Gerar relatório
+    function gerarRelatorio() {
+      const periodo = document.getElementById('periodo').value;
+      const consultor = document.getElementById('consultor').value;
+
+      if (!periodo) {
+        alert('Por favor, selecione um período.');
+        return;
+      }
+
+      const rows = document.querySelectorAll('#comissoes-table-body tr');
+      let totalLiberado = 0;
+      let totalComissoes = 0;
+      let linhasRelatorio = [];
+
+      rows.forEach(row => {
+        const consultorCell = row.cells[8].textContent;
+        if (consultor === 'todos' || consultorCell.toLowerCase().includes(consultor)) {
+          if (row.style.display !== 'none') {
+            const cliente = row.cells[1].textContent;
+            const produto = row.cells[2].textContent;
+            const banco = row.cells[3].textContent;
+            const valorLiberado = parseFloat(row.cells[4].textContent.replace('R$ ', '').replace('.', '').replace(',', '.'));
+            const percentual = row.cells[5].querySelector('input').value;
+            const comissao = parseFloat(row.cells[6].textContent.replace('R$ ', '').replace('.', '').replace(',', '.'));
+
+            totalLiberado += valorLiberado;
+            totalComissoes += comissao;
+
+            linhasRelatorio.push({
+              cliente,
+              produto,
+              banco,
+              valorLiberado,
+              percentual,
+              comissao,
+              consultor: consultorCell
+            });
+          }
+        }
+      });
+
+      if (linhasRelatorio.length === 0) {
+        alert('Nenhuma comissão encontrada para o período/consultor selecionado.');
+        return;
+      }
+
+      // Gerar CSV (compatível com Excel)
+      const csv = gerarCSV(linhasRelatorio, periodo, consultor, totalLiberado, totalComissoes);
+
+      // Baixar arquivo
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+      const url = URL.createObjectURL(blob);
+
+      const periodosLabel = {
+        'mes-atual': 'Julho_2026',
+        'mes-anterior': 'Junho_2026',
+        'trimestre': 'Q2_2026',
+        'ano': 'Ano_2026',
+        'personalizado': 'Personalizado'
+      };
+
+      link.setAttribute('href', url);
+      link.setAttribute('download', `Relatorio_Comissoes_${periodosLabel[periodo]}.csv`);
+      link.style.visibility = 'hidden';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      alert(`Relatório gerado e baixado!\n\nPeriodo: ${periodo}\nConsultor: ${consultor}\nTotal Liberado: R$ ${totalLiberado.toLocaleString('pt-BR')}\nTotal Comissões: R$ ${totalComissoes.toLocaleString('pt-BR')}`);
+    }
+
+    function gerarCSV(dados, periodo, consultor, totalLiberado, totalComissoes) {
+      let csv = 'RELATÓRIO DE COMISSÕES - MB SOLUÇÕES FINANCEIRAS\n';
+      csv += `Período: ${periodo}\n`;
+      csv += `Consultor: ${consultor}\n`;
+      csv += `Data do Relatório: ${new Date().toLocaleDateString('pt-BR')}\n\n`;
+
+      csv += 'Cliente,Produto,Banco,Valor Liberado,% Comissão,Valor Comissão,Consultor\n';
+
+      dados.forEach(linha => {
+        csv += `"${linha.cliente}","${linha.produto}","${linha.banco}",R$ ${linha.valorLiberado.toFixed(2)},${linha.percentual}%,R$ ${linha.comissao.toFixed(2)},"${linha.consultor}"\n`;
+      });
+
+      csv += '\n\n';
+      csv += 'RESUMO\n';
+      csv += `Total Liberado,R$ ${totalLiberado.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}\n`;
+      csv += `Total Comissões,R$ ${totalComissoes.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}\n`;
+      csv += `Quantidade de Leads,${dados.length}\n`;
+
+      return csv;
+    }
+
+    // Desabilita data recebimento se status é pendente
+    function atualizarDataRecebimento(select) {
+      const row = select.closest('tr');
+      const dataRec = row.querySelector('.data-recebimento');
+      const isPago = select.value === 'pago';
+
+      dataRec.disabled = !isPago;
+      if (!isPago) {
+        dataRec.value = '';
+      }
+      salvarComissoes();
+    }
+
+    // Salva ao marcar/desmarcar checkbox
+    function marcarComissao(checkbox) {
+      salvarComissoes();
+    }
+
+    // Salva ao mudar data
+    function salvarDataRecebimento(input) {
+      salvarComissoes();
+    }
+
+    // Filtro de consultor
+    document.getElementById('consultor').addEventListener('change', function(e) {
+      const consultor = e.target.value;
+      const rows = document.querySelectorAll('#comissoes-table-body tr');
+
+      rows.forEach(row => {
+        const consultorCell = row.cells[8].textContent;
+        if (consultor === 'todos' || consultorCell.toLowerCase().includes(consultor)) {
+          row.style.display = '';
+        } else {
+          row.style.display = 'none';
+        }
+      });
+    });
+
+    // Restringe edição a admin apenas
+    document.addEventListener('DOMContentLoaded', function() {
+      carregarComissoes();
+
+      const isAdmin = auth.isAdmin();
+      document.querySelectorAll('.comissao-input').forEach(input => {
+        input.disabled = !isAdmin;
+        input.style.cursor = isAdmin ? 'text' : 'not-allowed';
+        input.style.opacity = isAdmin ? '1' : '0.6';
+      });
+
+      document.querySelectorAll('.status-select, .data-recebimento, .comissao-flag').forEach(el => {
+        el.disabled = !isAdmin;
+        if (!isAdmin) el.style.opacity = '0.6';
+        el.addEventListener('change', (e) => {
+          if (!isAdmin) {
+            e.target.disabled = true;
+            alert('Apenas administrador pode alterar comissões');
+          }
+        });
+      });
+    });
+  </script>
+  <script src="auth.js"></script>
+</body>
+</html>

@@ -1,0 +1,1281 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Ficha do Lead — MB Hub</title>
+  <style>
+    :root {
+      --bg: #ffffff;
+      --surface: #f8f9fa;
+      --fg: #1a1a1a;
+      --muted: #6b7280;
+      --border: #e5e7eb;
+      --accent: #ca8c3f;
+      --accent-secondary: #141352;
+      --radius: 8px;
+      --font: 'Astra', system-ui, -apple-system, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { height: 100%; }
+    body {
+      min-height: 100%;
+      font-family: var(--font);
+      font-size: 15px;
+      line-height: 1.5;
+      color: var(--fg);
+      background: var(--surface);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Layout */
+    .app { display: flex; min-height: 100vh; }
+    .sidebar {
+      width: 240px;
+      background: var(--bg);
+      border-right: 1px solid var(--border);
+      padding: 24px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 32px;
+      flex-shrink: 0;
+    }
+    .main {
+      flex: 1;
+      padding: 24px;
+      overflow-x: hidden;
+    }
+
+    /* Sidebar */
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      color: var(--fg);
+    }
+    .brand-mark {
+      width: 40px;
+      height: 40px;
+      background: var(--accent);
+      border-radius: var(--radius);
+      display: grid;
+      place-items: center;
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--bg);
+    }
+    .brand span {
+      font-size: 18px;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+    }
+    .nav { display: flex; flex-direction: column; gap: 4px; }
+    .nav a {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 12px;
+      border-radius: var(--radius);
+      text-decoration: none;
+      color: var(--fg);
+      font-size: 14px;
+      font-weight: 500;
+      transition: background 0.15s;
+    }
+    .nav a:hover { background: var(--surface); }
+    .nav a.active { background: var(--surface); }
+    .nav svg { width: 20px; height: 20px; stroke: currentColor; fill: none; stroke-width: 1.8; }
+
+    .user-menu {
+      margin-top: auto;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px;
+      border-radius: var(--radius);
+      background: var(--surface);
+    }
+    .avatar {
+      width: 36px;
+      height: 36px;
+      background: var(--border);
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--muted);
+    }
+    .user-info { flex: 1; min-width: 0; }
+    .user-info strong { display: block; font-size: 13px; font-weight: 600; }
+    .user-info span { font-size: 12px; color: var(--muted); }
+
+    /* Header */
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 24px;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .back-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      background: var(--bg);
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+      transition: border-color 0.15s;
+      text-decoration: none;
+      color: var(--fg);
+    }
+    .back-btn:hover { border-color: var(--muted); }
+    .back-btn svg { width: 20px; height: 20px; stroke: currentColor; fill: none; stroke-width: 2; }
+    .header h1 {
+      font-size: 24px;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+    }
+    .header-actions { display: flex; gap: 12px; }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 16px;
+      border-radius: var(--radius);
+      font-size: 14px;
+      font-weight: 500;
+      text-decoration: none;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      color: var(--fg);
+      cursor: pointer;
+      transition: border-color 0.15s, background 0.15s;
+    }
+    .btn:hover { border-color: var(--muted); }
+    .btn-primary {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: var(--bg);
+    }
+    .btn-primary:hover { filter: brightness(0.95); border-color: var(--accent); }
+    .btn-danger {
+      border-color: var(--accent-secondary);
+      color: var(--accent-secondary);
+    }
+    .btn-danger:hover { background: rgba(217,83,79,0.08); }
+    .btn svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2; }
+
+    /* Stage Indicator */
+    .stage-indicator {
+      display: flex;
+      gap: 4px;
+      margin-bottom: 24px;
+    }
+    .stage-step {
+      flex: 1;
+      padding: 12px 16px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      font-size: 13px;
+      font-weight: 500;
+      text-align: center;
+      color: var(--muted);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .stage-step:first-child { border-radius: var(--radius) 0 0 var(--radius); }
+    .stage-step:last-child { border-radius: 0 var(--radius) var(--radius) 0; }
+    .stage-step.active {
+      background: var(--fg);
+      border-color: var(--fg);
+      color: var(--bg);
+    }
+    .stage-step.completed {
+      background: var(--surface);
+      color: var(--fg);
+    }
+    .stage-step:hover:not(.active) { background: var(--surface); }
+
+    /* Content Grid */
+    .content-grid {
+      display: grid;
+      grid-template-columns: 1fr 380px;
+      gap: 24px;
+    }
+    .panel {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+    .panel-header {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .panel-header h2 {
+      font-size: 16px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+    }
+    .panel-body { padding: 20px; }
+
+    /* Form */
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    .form-group { display: flex; flex-direction: column; gap: 6px; }
+    .form-group.full { grid-column: 1 / -1; }
+    .form-label {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--muted);
+      letter-spacing: 0.02em;
+    }
+    .form-input {
+      padding: 10px 14px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      font-size: 14px;
+      font-family: inherit;
+      color: var(--fg);
+      background: var(--bg);
+      transition: border-color 0.15s;
+    }
+    .form-input:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+    .form-input::placeholder { color: var(--muted); }
+    select.form-input {
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%238c8c8c' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      padding-right: 40px;
+    }
+    textarea.form-input {
+      resize: vertical;
+      min-height: 80px;
+    }
+
+    /* Tabs */
+    .tabs {
+      display: flex;
+      border-bottom: 1px solid var(--border);
+      padding: 0 20px;
+    }
+    .tab {
+      padding: 14px 16px;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--muted);
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -1px;
+      transition: all 0.15s;
+      background: none;
+      border-left: 0;
+      border-right: 0;
+      border-top: 0;
+    }
+    .tab:hover { color: var(--fg); }
+    .tab.active {
+      color: var(--fg);
+      border-bottom-color: var(--fg);
+    }
+    .tab-content { display: none; padding: 20px; }
+    .tab-content.active { display: block; }
+
+    /* Timeline */
+    .timeline { display: flex; flex-direction: column; gap: 16px; }
+    .timeline-item {
+      display: flex;
+      gap: 12px;
+      position: relative;
+    }
+    .timeline-item:not(:last-child)::after {
+      content: '';
+      position: absolute;
+      left: 15px;
+      top: 32px;
+      bottom: -16px;
+      width: 1px;
+      background: var(--border);
+    }
+    .timeline-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: var(--surface);
+      display: grid;
+      place-items: center;
+      flex-shrink: 0;
+    }
+    .timeline-icon svg { width: 16px; height: 16px; stroke: var(--muted); fill: none; stroke-width: 2; }
+    .timeline-icon.whatsapp { background: var(--accent); }
+    .timeline-icon.whatsapp svg { stroke: var(--bg); }
+    .timeline-content { flex: 1; padding-top: 4px; }
+    .timeline-content strong { font-size: 14px; font-weight: 600; display: block; }
+    .timeline-content p { font-size: 13px; color: var(--muted); margin-top: 2px; }
+    .timeline-content time { font-size: 12px; color: var(--muted); }
+
+    /* Product Card */
+    .product-card {
+      background: var(--surface);
+      border-radius: var(--radius);
+      padding: 16px;
+      margin-bottom: 16px;
+    }
+    .product-card-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+    .product-card-header h3 {
+      font-size: 15px;
+      font-weight: 600;
+    }
+    .product-card-header .badge {
+      font-size: 10px;
+      padding: 4px 8px;
+      background: var(--accent);
+      color: var(--bg);
+      border-radius: 4px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+    .product-details {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    .product-detail {
+      font-size: 13px;
+    }
+    .product-detail span {
+      display: block;
+      color: var(--muted);
+      margin-bottom: 2px;
+    }
+    .product-detail strong {
+      font-weight: 600;
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* WhatsApp Panel */
+    .whatsapp-panel {
+      background: var(--surface);
+      border-radius: var(--radius);
+      padding: 16px;
+    }
+    .whatsapp-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    .whatsapp-icon {
+      width: 40px;
+      height: 40px;
+      background: var(--accent);
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+    }
+    .whatsapp-icon svg { width: 22px; height: 22px; stroke: var(--bg); fill: none; stroke-width: 1.8; }
+    .whatsapp-info strong { font-size: 14px; font-weight: 600; display: block; }
+    .whatsapp-info span { font-size: 13px; color: var(--muted); }
+    .whatsapp-actions { display: flex; gap: 8px; }
+    .whatsapp-actions .btn { flex: 1; justify-content: center; }
+
+    /* Appointments */
+    .appointment-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .appointment-item:last-child { border-bottom: 0; }
+    .appointment-date {
+      width: 80px;
+      height: 48px;
+      background: var(--surface);
+      border-radius: var(--radius);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    .appointment-date .day {
+      font-size: 18px;
+      font-weight: 600;
+      line-height: 1;
+      font-variant-numeric: tabular-nums;
+    }
+    .appointment-date .month {
+      font-size: 10px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+    .appointment-info { flex: 1; }
+    .appointment-info strong { font-size: 14px; font-weight: 600; display: block; }
+    .appointment-info span { font-size: 13px; color: var(--muted); }
+    .appointment-time {
+      font-size: 13px;
+      font-weight: 600;
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* Responsive */
+    @media (max-width: 1200px) {
+      .content-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 768px) {
+      .sidebar { display: none; }
+      .main { padding: 16px; }
+      .form-grid { grid-template-columns: 1fr; }
+      .stage-indicator { flex-wrap: wrap; }
+      .stage-step { flex: 1 1 calc(50% - 2px); }
+      .stage-step:first-child { border-radius: var(--radius) 0 0 0; }
+      .stage-step:nth-child(2) { border-radius: 0 var(--radius) 0 0; }
+      .stage-step:nth-child(3) { border-radius: 0 0 0 var(--radius); }
+      .stage-step:last-child { border-radius: 0 0 var(--radius) 0; }
+    }
+    @media (max-width: 480px) {
+      .header { flex-direction: column; align-items: flex-start; }
+      .header-actions { width: 100%; }
+      .header-actions .btn { flex: 1; justify-content: center; }
+    }
+
+    /* Modal LGPD */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal.active { display: flex; }
+    .modal-content {
+      background: var(--bg);
+      border-radius: var(--radius);
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      max-width: 500px;
+      width: 90%;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+    .modal-header {
+      padding: 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .modal-header h2 { font-size: 18px; font-weight: 600; }
+    .modal-close {
+      width: 32px;
+      height: 32px;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      border-radius: var(--radius);
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+      transition: border-color 0.15s;
+      font-size: 24px;
+      color: var(--muted);
+    }
+    .modal-close:hover { border-color: var(--muted); }
+    .modal-body { padding: 20px; }
+    .modal-footer {
+      padding: 16px 20px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      gap: 12px;
+      justify-content: flex-end;
+    }
+
+    .lgpd-item {
+      display: flex;
+      gap: 12px;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .lgpd-item:last-child { border-bottom: 0; }
+    .lgpd-checkbox {
+      width: 20px;
+      height: 20px;
+      cursor: pointer;
+      accent-color: var(--accent);
+      margin-top: 2px;
+      flex-shrink: 0;
+    }
+    .lgpd-content {
+      flex: 1;
+    }
+    .lgpd-content strong { font-size: 14px; display: block; margin-bottom: 2px; }
+    .lgpd-content span { font-size: 13px; color: var(--muted); }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <a href="index.html" class="brand">
+        <img src="mr2km39w-IMG_3972.jpg" alt="MB" style="width: 80px; height: auto;">
+        <span>MB Hub</span>
+      </a>
+
+      <nav class="nav">
+        <a href="dashboard.html">
+          <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+          Dashboard
+        </a>
+        <a href="pipeline.html">
+          <svg viewBox="0 0 24 24"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+          Pipeline
+        </a>
+        <a href="clientes.html">
+          <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          Clientes
+        </a>
+        <a href="lead-detail.html" class="active">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-6 8-6s8 2 8 6"/></svg>
+          Novo Lead
+        </a>
+        <a href="#">
+          <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18"/></svg>
+          Agenda
+        </a>
+        <a href="#">
+          <svg viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+          WhatsApp
+        </a>
+        <a href="#">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          Configurações
+        </a>
+      </nav>
+
+      <div class="user-menu">
+        <div class="avatar">MC</div>
+        <div class="user-info">
+          <strong>Márcia Braga</strong>
+          <span>Administrador</span>
+        </div>
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="header">
+        <div class="header-left">
+          <a href="pipeline.html" class="back-btn">
+            <svg viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+          </a>
+          <h1>João Carlos Silva</h1>
+        </div>
+        <div class="header-actions">
+          <button class="btn btn-danger">
+            <svg viewBox="0 0 24 24"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+            Excluir
+          </button>
+          <button class="btn btn-primary" onclick="salvarFormulario()">
+            <svg viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17,21 17,13 7,13 7,21"/><polyline points="7,3 7,8 15,8"/></svg>
+            Salvar
+          </button>
+        </div>
+      </header>
+
+      <div class="stage-indicator">
+        <div class="stage-step completed">Análise</div>
+        <div class="stage-step active">Aprovação</div>
+        <div class="stage-step">Formalização</div>
+        <div class="stage-step">Finalizado</div>
+      </div>
+
+      <div class="content-grid">
+        <div class="panels-left">
+          <section class="panel" style="margin-bottom: 24px;">
+            <div class="tabs">
+              <button class="tab active" data-tab="dados">Dados pessoais</button>
+              <button class="tab" data-tab="historico">Histórico</button>
+              <button class="tab" data-tab="agendamentos">Agendamentos</button>
+              <button class="tab" data-tab="documentos">Documentos</button>
+            </div>
+
+            <div class="tab-content active" id="dados">
+              <div class="form-grid">
+                <div class="form-group">
+                  <label class="form-label">Nome completo</label>
+                  <input type="text" class="form-input" value="João Carlos Silva">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">CPF</label>
+                  <input type="text" class="form-input" value="123.456.789-00">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">E-mail</label>
+                  <input type="email" class="form-input" value="joao.silva@email.com">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Telefone</label>
+                  <input type="tel" class="form-input" value="(11) 98765-4321">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Data de nascimento</label>
+                  <input type="date" class="form-input" value="1985-03-15">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Renda bruta</label>
+                  <input type="text" class="form-input" value="R$ 8.500,00">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Imposto de Renda</label>
+                  <div style="display: flex; align-items: center; gap: 8px;">
+                    <input type="checkbox" id="declarado-ir" style="width: 20px; height: 20px; cursor: pointer; accent-color: var(--accent);">
+                    <span style="font-size: 13px; color: var(--muted);">Declarado</span>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Origem do lead</label>
+                  <select class="form-input">
+                    <option value="whatsapp" selected>WhatsApp</option>
+                    <option value="instagram">Instagram</option>
+                    <option value="indicacao">Indicação</option>
+                    <option value="trafego">Tráfego pago</option>
+                    <option value="site">Site</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Consultor responsável</label>
+                  <select class="form-input">
+                    <option value="marcin" selected>Márcia Braga</option>
+                    <option value="ana">Ana Pereira</option>
+                    <option value="carlos">Carlos Mendes</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Data de entrada</label>
+                  <input type="date" class="form-input" value="2026-06-25">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Último contato</label>
+                  <input type="date" class="form-input" value="2026-07-01">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Data de criação</label>
+                  <input type="date" class="form-input" value="2026-06-25" disabled style="background: var(--surface); cursor: not-allowed;">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Última atualização</label>
+                  <input type="date" class="form-input" value="2026-07-01" disabled style="background: var(--surface); cursor: not-allowed;">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Produto indicado</label>
+                  <select class="form-input" id="produto-select" onchange="handleProdutoChange()">
+                    <option value="">Selecione o produto</option>
+                    <optgroup label="Crédito">
+                      <option value="credito-pessoal">Crédito Pessoal</option>
+                      <option value="credito-consignado" selected>Crédito Consignado</option>
+                      <option value="credito-empresarial">Crédito Empresarial</option>
+                      <option value="credito-construcao">Crédito Construção</option>
+                      <option value="home-equity">Home Equity</option>
+                    </optgroup>
+                    <optgroup label="Consórcio">
+                      <option value="carta-contemplada">Carta Contemplada (Consórcio)</option>
+                      <option value="consorcio-automovel">Consórcio Automóvel</option>
+                      <option value="consorcio-imovel">Consórcio Imóvel</option>
+                      <option value="consorcio-servicos">Consórcio Serviços</option>
+                    </optgroup>
+                    <optgroup label="Financiamento e Investimentos">
+                      <option value="financiamento-imobiliario">Financiamento Imobiliário</option>
+                      <option value="investimentos">Investimentos</option>
+                      <option value="cambio">Câmbio</option>
+                    </optgroup>
+                    <optgroup label="Outros Produtos">
+                      <option value="cartao-credito">Cartão de Crédito</option>
+                      <option value="seguros">Seguros</option>
+                      <option value="consultoria">Consultoria Financeira</option>
+                      <option value="matricula">Matrícula</option>
+                      <option value="outros-servicos">Outros Serviços</option>
+                      <option value="outros">Outros (especificar)</option>
+                    </optgroup>
+                  </select>
+                </div>
+                <div class="form-group" id="produto-especifico-group" style="display: none;">
+                  <label class="form-label">Especifique o produto</label>
+                  <input type="text" class="form-input" id="produto-especifico" placeholder="Descreva o produto não listado acima">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Banco</label>
+                  <select class="form-input" id="banco-select" onchange="handleBancoChange()">
+                    <option value="">Selecione o banco</option>
+                    <option value="itau" selected>Itaú</option>
+                    <option value="bb">Banco do Brasil</option>
+                    <option value="caixa">Caixa Econômica</option>
+                    <option value="bradesco">Bradesco</option>
+                    <option value="santander">Santander</option>
+                    <option value="inter">Inter</option>
+                    <option value="nubank">Nubank</option>
+                    <option value="c6">C6 Bank</option>
+                    <option value="sicoob">Sicoob</option>
+                    <option value="sicredi">Sicredi</option>
+                    <option value="safra">Safra</option>
+                    <option value="bmg">BMG</option>
+                    <option value="pan">Banco Pan</option>
+                    <option value="outros">Outros (especificar)</option>
+                  </select>
+                </div>
+                <div class="form-group" id="banco-especifico-group" style="display: none;">
+                  <label class="form-label">Especifique o banco</label>
+                  <input type="text" class="form-input" id="banco-especifico" placeholder="Descreva o banco não listado acima">
+                </div>
+                <div class="form-group full">
+                  <label class="form-label">Link Google Drive</label>
+                  <input type="url" class="form-input" placeholder="https://drive.google.com/drive/folders/..." value="">
+                </div>
+                <div class="form-group full">
+                  <label class="form-label">Observações</label>
+                  <textarea class="form-input" placeholder="Anotações sobre o lead...">Cliente aposentado INSS, margem disponível confirmada. Preferência por parcelas menores.</textarea>
+                </div>
+              </div>
+            </div>
+
+            <div class="tab-content" id="historico">
+              <div class="timeline">
+                <div class="timeline-item">
+                  <div class="timeline-icon whatsapp">
+                    <svg viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+                  </div>
+                  <div class="timeline-content">
+                    <strong>Mensagem WhatsApp enviada</strong>
+                    <p>Proposta de crédito consignado com taxa de 1,79% a.m.</p>
+                    <time>Hoje às 14:32</time>
+                  </div>
+                </div>
+                <div class="timeline-item">
+                  <div class="timeline-icon">
+                    <svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22,4 12,14.01 9,11.01"/></svg>
+                  </div>
+                  <div class="timeline-content">
+                    <strong>Aprovação de crédito confirmada</strong>
+                    <p>Banco Itaú — Limite de R$ 45.000</p>
+                    <time>Ontem às 16:45</time>
+                  </div>
+                </div>
+                <div class="timeline-item">
+                  <div class="timeline-icon">
+                    <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18"/></svg>
+                  </div>
+                  <div class="timeline-content">
+                    <strong>Consultoria agendada</strong>
+                    <p>Reunião de análise de documentos</p>
+                    <time>28/06/2026 às 09:00</time>
+                  </div>
+                </div>
+                <div class="timeline-item">
+                  <div class="timeline-icon">
+                    <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14,2 14,8 20,8"/></svg>
+                  </div>
+                  <div class="timeline-content">
+                    <strong>Documentos recebidos</strong>
+                    <p>RG, CPF, comprovante de renda</p>
+                    <time>27/06/2026 às 10:20</time>
+                  </div>
+                </div>
+                <div class="timeline-item">
+                  <div class="timeline-icon whatsapp">
+                    <svg viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+                  </div>
+                  <div class="timeline-content">
+                    <strong>Primeiro contato via WhatsApp</strong>
+                    <p>Lead entrou pelo formulário do site</p>
+                    <time>25/06/2026 às 08:15</time>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="tab-content" id="agendamentos">
+              <div class="appointment-item">
+                <div class="appointment-date">
+                  <span class="day">02</span>
+                  <span class="month">Jul</span>
+                </div>
+                <div class="appointment-info">
+                  <strong>Assinatura de contrato</strong>
+                  <span>Reunião presencial</span>
+                </div>
+                <span class="appointment-time">10:00</span>
+              </div>
+              <div class="appointment-item">
+                <div class="appointment-date">
+                  <span class="day">28</span>
+                  <span class="month">Jun</span>
+                </div>
+                <div class="appointment-info">
+                  <strong>Análise de documentos</strong>
+                  <span>Consultoria online</span>
+                </div>
+                <span class="appointment-time">09:00</span>
+              </div>
+              <button class="btn" style="width: 100%; justify-content: center; margin-top: 16px;">
+                <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+                Agendar consultoria
+              </button>
+            </div>
+
+            <div class="tab-content" id="documentos">
+              <div id="drive-status" style="padding: 20px; background: var(--surface); border-radius: var(--radius); margin-bottom: 16px; display: flex; align-items: center; gap: 12px;">
+                <svg style="width: 20px; height: 20px; stroke: var(--muted); fill: none; stroke-width: 2;" viewBox="0 0 24 24">
+                  <circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>
+                </svg>
+                <div style="flex: 1;">
+                  <div style="font-weight: 600; font-size: 14px; margin-bottom: 2px;">Google Drive não conectado</div>
+                  <div style="font-size: 13px; color: var(--muted);">Configure o MCP Google Drive em Settings para visualizar documentos</div>
+                </div>
+              </div>
+
+              <div id="documentos-list">
+                <!-- Lista de documentos será populada via JavaScript quando Google Drive estiver conectado -->
+                <div class="empty-state" style="text-align: center; padding: 40px 20px; color: var(--muted);">
+                  <svg style="width: 48px; height: 48px; stroke: var(--muted); fill: none; stroke-width: 1.5; margin: 0 auto 16px;" viewBox="0 0 24 24">
+                    <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13,2 13,9 20,9"/>
+                  </svg>
+                  <p style="font-size: 14px; margin-bottom: 8px; font-weight: 500;">Documentos do Google Drive</p>
+                  <p style="font-size: 13px;">Pasta: <strong>Equipe MB / João Carlos Silva</strong></p>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+
+        <div class="panels-right">
+          <section class="panel" style="margin-bottom: 16px;">
+            <div class="panel-header">
+              <h2>Produto indicado</h2>
+            </div>
+            <div class="panel-body">
+              <div class="product-card">
+                <div class="product-card-header">
+                  <h3>Crédito Consignado</h3>
+                  <span class="badge">Aprovado</span>
+                </div>
+                <div class="product-details">
+                  <div class="product-detail">
+                    <span>Valor</span>
+                    <strong>R$ 45.000</strong>
+                  </div>
+                  <div class="product-detail">
+                    <span>Taxa</span>
+                    <strong>1,79% a.m.</strong>
+                  </div>
+                  <div class="product-detail">
+                    <span>Parcelas</span>
+                    <strong>84×</strong>
+                  </div>
+                  <div class="product-detail">
+                    <span>Banco</span>
+                    <strong>Itaú</strong>
+                  </div>
+                </div>
+              </div>
+              <button class="btn" style="width: 100%; justify-content: center;">
+                <svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                Alterar produto
+              </button>
+            </div>
+          </section>
+
+          <section class="panel">
+            <div class="panel-header">
+              <h2>Autorização LGPD</h2>
+            </div>
+            <div class="panel-body">
+              <div style="background: var(--surface); border-radius: var(--radius); padding: 12px; margin-bottom: 12px; border-left: 4px solid var(--accent);">
+                <div style="font-size: 13px; font-weight: 500; margin-bottom: 8px;">Status: <span id="lgpd-status" style="color: var(--warning);">Aguardando autorização</span></div>
+                <button class="btn btn-primary" style="width: 100%; justify-content: center;" onclick="abrirModalLGPD()">
+                  <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5 5-5-5M12 13V3"/></svg>
+                  Enviar Autorização
+                </button>
+              </div>
+            </div>
+          </section>
+
+          <section class="panel">
+            <div class="panel-header">
+              <h2>WhatsApp</h2>
+            </div>
+            <div class="panel-body">
+              <div class="whatsapp-panel">
+                <div class="whatsapp-header">
+                  <div class="whatsapp-icon">
+                    <svg viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+                  </div>
+                  <div class="whatsapp-info">
+                    <strong>(11) 98765-4321</strong>
+                    <span>Última msg: hoje às 14:32</span>
+                  </div>
+                </div>
+                <div class="whatsapp-actions">
+                  <button class="btn btn-primary" onclick="enviarAutorizacaoWhatsApp()">
+                    <svg viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+                    Enviar via WhatsApp
+                  </button>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Modal LGPD -->
+  <div class="modal" id="modal-lgpd">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Autorização LGPD</h2>
+        <button class="modal-close" onclick="fecharModalLGPD()">×</button>
+      </div>
+      <div class="modal-body">
+        <p style="font-size: 14px; margin-bottom: 16px; color: var(--fg); line-height: 1.6;">
+          Conforme a Lei Geral de Proteção de Dados (LGPD), você autoriza a MB Soluções Financeiras a coletar, processar e armazenar seus dados pessoais para fins de análise financeira e comunicação?
+        </p>
+
+        <div class="lgpd-item">
+          <input type="checkbox" class="lgpd-checkbox" id="lgpd-coleta" checked>
+          <div class="lgpd-content">
+            <strong>Coleta de dados pessoais</strong>
+            <span>Nome, CPF, telefone, e-mail e documentos</span>
+          </div>
+        </div>
+
+        <div class="lgpd-item">
+          <input type="checkbox" class="lgpd-checkbox" id="lgpd-processamento" checked>
+          <div class="lgpd-content">
+            <strong>Processamento de informações</strong>
+            <span>Análise financeira e concessão de crédito</span>
+          </div>
+        </div>
+
+        <div class="lgpd-item">
+          <input type="checkbox" class="lgpd-checkbox" id="lgpd-comunicacao" checked>
+          <div class="lgpd-content">
+            <strong>Comunicação via WhatsApp</strong>
+            <span>Receber propostas, atualizações e acompanhamento</span>
+          </div>
+        </div>
+
+        <div class="lgpd-item">
+          <input type="checkbox" class="lgpd-checkbox" id="lgpd-compartilhamento">
+          <div class="lgpd-content">
+            <strong>Compartilhamento com instituições financeiras</strong>
+            <span>Dados serão compartilhados com bancos para análise de crédito</span>
+          </div>
+        </div>
+
+        <div style="background: var(--surface); border-radius: var(--radius); padding: 12px; margin-top: 16px; border-left: 4px solid var(--accent);">
+          <p style="font-size: 12px; color: var(--muted); line-height: 1.5;">
+            <strong>Direitos LGPD:</strong> Você tem direito a acessar, corrigir ou excluir seus dados. Acesse nossa <a href="#" style="color: var(--accent); text-decoration: none;">Política de Privacidade</a> para mais informações.
+          </p>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn" onclick="fecharModalLGPD()">Cancelar</button>
+        <button class="btn btn-primary" onclick="confirmarLGPD()">Autorizar e Enviar</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Tab switching
+    document.querySelectorAll('.tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        const tabId = tab.dataset.tab;
+
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+
+        tab.classList.add('active');
+        document.getElementById(tabId).classList.add('active');
+      });
+    });
+
+    // Stage selection
+    document.querySelectorAll('.stage-step').forEach(step => {
+      step.addEventListener('click', () => {
+        document.querySelectorAll('.stage-step').forEach(s => {
+          s.classList.remove('active');
+          s.classList.remove('completed');
+        });
+
+        let found = false;
+        document.querySelectorAll('.stage-step').forEach(s => {
+          if (s === step) {
+            s.classList.add('active');
+            found = true;
+          } else if (!found) {
+            s.classList.add('completed');
+          }
+        });
+      });
+    });
+
+    // Form input formatting
+    const cpfInput = document.querySelector('input[value*="123"]');
+    if (cpfInput) {
+      cpfInput.addEventListener('input', e => {
+        let v = e.target.value.replace(/\D/g, '').slice(0, 11);
+        if (v.length > 9) v = v.replace(/(\d{3})(\d{3})(\d{3})(\d{1,2})/, '$1.$2.$3-$4');
+        else if (v.length > 6) v = v.replace(/(\d{3})(\d{3})(\d{1,3})/, '$1.$2.$3');
+        else if (v.length > 3) v = v.replace(/(\d{3})(\d{1,3})/, '$1.$2');
+        e.target.value = v;
+      });
+    }
+
+    const phoneInput = document.querySelector('input[type="tel"]');
+    if (phoneInput) {
+      phoneInput.addEventListener('input', e => {
+        let v = e.target.value.replace(/\D/g, '').slice(0, 11);
+        if (v.length > 6) v = v.replace(/(\d{2})(\d{5})(\d{1,4})/, '($1) $2-$3');
+        else if (v.length > 2) v = v.replace(/(\d{2})(\d{1,5})/, '($1) $2');
+        e.target.value = v;
+      });
+    }
+
+    // Funções para mostrar/ocultar campos de especificação
+    function handleProdutoChange() {
+      const select = document.getElementById('produto-select');
+      const specGroup = document.getElementById('produto-especifico-group');
+      const specInput = document.getElementById('produto-especifico');
+
+      if (select.value === 'outros') {
+        specGroup.style.display = 'flex';
+        specInput.focus();
+      } else {
+        specGroup.style.display = 'none';
+        specInput.value = '';
+      }
+    }
+
+    function handleBancoChange() {
+      const select = document.getElementById('banco-select');
+      const specGroup = document.getElementById('banco-especifico-group');
+      const specInput = document.getElementById('banco-especifico');
+
+      if (select.value === 'outros') {
+        specGroup.style.display = 'flex';
+        specInput.focus();
+      } else {
+        specGroup.style.display = 'none';
+        specInput.value = '';
+      }
+    }
+
+    // Validação ao salvar
+    function salvarFormulario() {
+      const produtoSelect = document.getElementById('produto-select');
+      const bancoSelect = document.getElementById('banco-select');
+      const produtoEspecifico = document.getElementById('produto-especifico');
+      const bancoEspecifico = document.getElementById('banco-especifico');
+
+      if (produtoSelect.value === 'outros' && !produtoEspecifico.value.trim()) {
+        alert('Por favor, especifique o produto quando "Outros" está selecionado.');
+        produtoEspecifico.focus();
+        return false;
+      }
+
+      if (bancoSelect.value === 'outros' && !bancoEspecifico.value.trim()) {
+        alert('Por favor, especifique o banco quando "Outros" está selecionado.');
+        bancoEspecifico.focus();
+        return false;
+      }
+
+      // Salvar dados no localStorage
+      const leadData = {
+        nome: document.querySelector('input[type="text"]').value,
+        declaradoIR: document.getElementById('declarado-ir').checked,
+        produto: produtoSelect.value,
+        produtoEspecifico: produtoSelect.value === 'outros' ? produtoEspecifico.value : '',
+        banco: bancoSelect.value,
+        bancoEspecifico: bancoSelect.value === 'outros' ? bancoEspecifico.value : '',
+        timestamp: new Date().toISOString()
+      };
+
+      localStorage.setItem('mb_hub_current_lead', JSON.stringify(leadData));
+      alert('Lead salvo com sucesso!');
+      return true;
+    }
+
+    // Carregar dados ao abrir a página
+    window.addEventListener('load', function() {
+      const stored = localStorage.getItem('mb_hub_current_lead');
+      if (stored) {
+        try {
+          const leadData = JSON.parse(stored);
+          document.getElementById('declarado-ir').checked = leadData.declaradoIR || false;
+        } catch (e) {
+          console.error('Erro ao carregar lead:', e);
+        }
+      }
+      verificarStatusLGPD();
+    });
+
+    // LGPD Functions
+    function abrirModalLGPD() {
+      document.getElementById('modal-lgpd').classList.add('active');
+    }
+
+    function fecharModalLGPD() {
+      document.getElementById('modal-lgpd').classList.remove('active');
+    }
+
+    function confirmarLGPD() {
+      const clienteName = document.querySelector('input[type="text"]').value;
+      const clientePhone = document.querySelector('input[type="tel"]').value;
+      const autorizacoes = {
+        coleta: document.getElementById('lgpd-coleta').checked,
+        processamento: document.getElementById('lgpd-processamento').checked,
+        comunicacao: document.getElementById('lgpd-comunicacao').checked,
+        compartilhamento: document.getElementById('lgpd-compartilhamento').checked,
+        timestamp: new Date().toISOString(),
+        cliente: clienteName,
+        telefone: clientePhone
+      };
+
+      // Salvar no localStorage
+      const leadData = JSON.parse(localStorage.getItem('mb_hub_current_lead') || '{}');
+      leadData.lgpd = autorizacoes;
+      localStorage.setItem('mb_hub_current_lead', JSON.stringify(leadData));
+
+      // Atualizar status
+      document.getElementById('lgpd-status').textContent = 'Autorizado em ' + new Date().toLocaleDateString('pt-BR');
+      document.getElementById('lgpd-status').style.color = '#17a34a';
+
+      fecharModalLGPD();
+      alert('Autorização LGPD registrada com sucesso!');
+    }
+
+    function verificarStatusLGPD() {
+      const leadData = JSON.parse(localStorage.getItem('mb_hub_current_lead') || '{}');
+      if (leadData.lgpd) {
+        document.getElementById('lgpd-status').textContent = 'Autorizado em ' + new Date(leadData.lgpd.timestamp).toLocaleDateString('pt-BR');
+        document.getElementById('lgpd-status').style.color = '#17a34a';
+      }
+    }
+
+    function enviarAutorizacaoWhatsApp() {
+      const clienteName = document.querySelector('input[type="text"]').value;
+      const clientePhone = document.querySelector('input[type="tel"]').value.replace(/\D/g, '');
+
+      if (!clientePhone) {
+        alert('Por favor, preencha o telefone do cliente para enviar via WhatsApp.');
+        return;
+      }
+
+      const mensagem = `Olá ${clienteName}, recebemos seus dados! Estamos prontos para avançar com sua análise financeira. Obrigado por confiar na MB Soluções Financeiras.`;
+
+      // Link WhatsApp
+      const whatsappLink = `https://api.whatsapp.com/send?phone=55${clientePhone}&text=${encodeURIComponent(mensagem)}`;
+      window.open(whatsappLink, '_blank');
+
+      // Registrar envio
+      const leadData = JSON.parse(localStorage.getItem('mb_hub_current_lead') || '{}');
+      if (!leadData.lgpd) leadData.lgpd = {};
+      leadData.lgpd.whatsappEnviadoEm = new Date().toISOString();
+      localStorage.setItem('mb_hub_current_lead', JSON.stringify(leadData));
+    }
+  </script>
+  <script src="google-drive-connector.js"></script>
+  <script>
+    // Integração Google Drive
+    async function initDriveDocuments() {
+      const status = await driveConnector.init();
+      const statusElement = document.getElementById('drive-status');
+      const listElement = document.getElementById('documentos-list');
+
+      if (status.status === 'pending') {
+        // Mostra instruções de conexão
+        const instructions = driveConnector.getConnectionInstructions();
+        statusElement.innerHTML = `
+          <svg style="width: 20px; height: 20px; stroke: var(--muted); fill: none; stroke-width: 2;" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/>
+          </svg>
+          <div style="flex: 1;">
+            <div style="font-weight: 600; font-size: 14px; margin-bottom: 2px;">Google Drive não conectado</div>
+            <div style="font-size: 13px; color: var(--muted);">${status.message}</div>
+          </div>
+        `;
+      } else if (driveConnector.isConnected()) {
+        // Carrega documentos do cliente
+        try {
+          const clientName = document.querySelector('input[type="text"]').value.split(' ');
+          const nome = clientName[0];
+          const sobrenome = clientName.slice(1).join(' ');
+
+          const folder = await driveConnector.buscarPastaCliente(nome, sobrenome);
+          const docs = await driveConnector.listarDocumentos(folder.id);
+
+          statusElement.innerHTML = `
+            <svg style="width: 20px; height: 20px; stroke: #17a34a; fill: none; stroke-width: 2;" viewBox="0 0 24 24">
+              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22,4 12,14.01 9,11.01"/>
+            </svg>
+            <div style="flex: 1;">
+              <div style="font-weight: 600; font-size: 14px; margin-bottom: 2px;">Conectado ao Google Drive</div>
+              <div style="font-size: 13px; color: var(--muted);">Pasta: Equipe MB / ${folder.name}</div>
+            </div>
+          `;
+
+          if (docs.length > 0) {
+            listElement.innerHTML = docs.map(doc => `
+              <div class="document-item" style="display: flex; align-items: center; gap: 12px; padding: 12px; border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: 8px; cursor: pointer; transition: all 0.15s;" onclick="driveConnector.abrirDocumento('${doc.webViewLink}')">
+                <svg style="width: 32px; height: 32px; stroke: var(--accent); fill: none; stroke-width: 1.5;" viewBox="0 0 24 24">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14,2 14,8 20,8"/>
+                </svg>
+                <div style="flex: 1; min-width: 0;">
+                  <div style="font-weight: 500; font-size: 14px; margin-bottom: 2px;">${doc.name}</div>
+                  <div style="font-size: 12px; color: var(--muted);">Modificado: ${new Date(doc.modifiedTime).toLocaleDateString('pt-BR')}</div>
+                </div>
+                <svg style="width: 16px; height: 16px; stroke: var(--muted); fill: none; stroke-width: 2;" viewBox="0 0 24 24">
+                  <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14L21 3"/>
+                </svg>
+              </div>
+            `).join('');
+          }
+        } catch (error) {
+          console.error('Erro ao carregar documentos:', error);
+        }
+      }
+    }
+
+    // Inicializa ao carregar a aba de documentos
+    document.querySelector('[data-tab="documentos"]').addEventListener('click', initDriveDocuments);
+  </script>
+  <script src="auth.js"></script>
+</body>
+</html>

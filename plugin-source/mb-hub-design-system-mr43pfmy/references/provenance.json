@@ -1,0 +1,19 @@
+{
+  "candidateId": "65c0deeb-d229-4443-b914-4e78fd14aa2c",
+  "projectId": "58d863c1-5e38-43a4-a46c-43b820ff510e",
+  "runId": "5c9d0605-97fb-4181-8d80-bab949aa3c19",
+  "conversationId": "6b97d937-57b3-4774-a991-8dc6255d5ed7",
+  "provenance": {
+    "summary": "Detected from DESIGN-SYSTEM.md after a successful run.",
+    "detectedAt": 1782997289052
+  },
+  "sourceRefs": [
+    {
+      "kind": "file",
+      "value": "DESIGN-SYSTEM.md",
+      "label": "DESIGN-SYSTEM.md",
+      "size": 11296,
+      "copied": true
+    }
+  ]
+}

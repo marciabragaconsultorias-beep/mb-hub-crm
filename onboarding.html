@@ -1,0 +1,463 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Bem-vindo ao MB Hub</title>
+  <style>
+    :root {
+      --bg: #ffffff;
+      --surface: #f8f9fa;
+      --fg: #1a1a1a;
+      --muted: #6b7280;
+      --border: #e5e7eb;
+      --accent: #ca8c3f;
+      --accent-secondary: #141352;
+      --radius: 8px;
+      --font: 'Astra', system-ui, -apple-system, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; font-family: var(--font); font-size: 15px; line-height: 1.5; color: var(--fg); background: linear-gradient(135deg, #f5f1e8 0%, #fafaf8 100%); -webkit-font-smoothing: antialiased; }
+
+    .container {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 48px;
+      max-width: 600px;
+    }
+    .logo { width: 100px; height: auto; margin-bottom: 24px; }
+    .header h1 { font-size: 32px; font-weight: 600; letter-spacing: -0.02em; margin-bottom: 12px; }
+    .header p { font-size: 16px; color: var(--muted); }
+
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 24px;
+      max-width: 1000px;
+      margin-bottom: 48px;
+    }
+
+    .step-card {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+      transition: all 0.15s;
+    }
+    .step-card:hover {
+      border-color: var(--accent);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+      transform: translateY(-2px);
+    }
+
+    .step-number {
+      display: inline-flex;
+      width: 40px;
+      height: 40px;
+      background: var(--accent);
+      color: var(--bg);
+      border-radius: 50%;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      font-size: 18px;
+      margin-bottom: 12px;
+    }
+
+    .step-card h3 {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      letter-spacing: -0.01em;
+    }
+
+    .step-card p {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.6;
+      margin-bottom: 12px;
+    }
+
+    .feature-list {
+      list-style: none;
+      margin-top: 12px;
+    }
+    .feature-list li {
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 6px;
+      padding-left: 20px;
+      position: relative;
+    }
+    .feature-list li::before {
+      content: '✓';
+      position: absolute;
+      left: 0;
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    .faq-section {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      max-width: 800px;
+      padding: 32px;
+      margin-bottom: 32px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    }
+
+    .faq-section h2 {
+      font-size: 24px;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      margin-bottom: 24px;
+    }
+
+    .faq-item {
+      margin-bottom: 24px;
+    }
+    .faq-item:last-child { margin-bottom: 0; }
+
+    .faq-question {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--fg);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border);
+      user-select: none;
+    }
+
+    .faq-question::before {
+      content: '+';
+      display: inline-flex;
+      width: 24px;
+      height: 24px;
+      background: var(--surface);
+      border-radius: 50%;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      color: var(--accent);
+      flex-shrink: 0;
+      transition: transform 0.2s;
+    }
+
+    .faq-item.open .faq-question::before {
+      transform: rotate(45deg);
+    }
+
+    .faq-answer {
+      display: none;
+      padding-top: 12px;
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .faq-item.open .faq-answer {
+      display: block;
+    }
+
+    .help-contact {
+      background: linear-gradient(135deg, var(--accent), var(--accent-secondary));
+      color: var(--bg);
+      border-radius: var(--radius);
+      padding: 24px;
+      max-width: 800px;
+      margin-bottom: 32px;
+      box-shadow: 0 8px 24px rgba(202, 140, 63, 0.2);
+    }
+
+    .help-contact h3 { font-size: 18px; font-weight: 600; margin-bottom: 8px; }
+    .help-contact p { font-size: 14px; margin-bottom: 16px; opacity: 0.95; }
+
+    .help-buttons {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      padding: 10px 16px;
+      border-radius: var(--radius);
+      font-size: 14px;
+      font-weight: 500;
+      border: 1px solid transparent;
+      cursor: pointer;
+      transition: all 0.15s;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: var(--bg);
+      border-color: var(--accent);
+    }
+    .btn-primary:hover { filter: brightness(0.95); }
+
+    .btn-secondary {
+      background: var(--bg);
+      color: var(--fg);
+      border-color: var(--border);
+    }
+    .btn-secondary:hover { border-color: var(--muted); }
+
+    .help-contact .btn {
+      background: rgba(255, 255, 255, 0.2);
+      color: var(--bg);
+      border-color: rgba(255, 255, 255, 0.3);
+    }
+    .help-contact .btn:hover {
+      background: rgba(255, 255, 255, 0.3);
+      border-color: rgba(255, 255, 255, 0.5);
+    }
+
+    .actions {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      max-width: 600px;
+    }
+
+    .progress {
+      display: flex;
+      gap: 4px;
+      justify-content: center;
+      margin-bottom: 32px;
+    }
+    .progress-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--border);
+      transition: background 0.2s;
+    }
+    .progress-dot.active { background: var(--accent); }
+
+    @media (max-width: 768px) {
+      .header h1 { font-size: 24px; }
+      .steps { grid-template-columns: 1fr; }
+      .help-buttons { flex-direction: column; }
+      .actions { flex-direction: column; }
+      .actions .btn { width: 100%; justify-content: center; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <img src="mr2km39w-IMG_3972.jpg" alt="MB Hub" class="logo">
+      <h1>Bem-vindo ao MB Hub!</h1>
+      <p>Sistema completo de gestão de leads e clientes para MB Soluções Financeiras</p>
+    </div>
+
+    <div class="progress">
+      <div class="progress-dot active"></div>
+      <div class="progress-dot"></div>
+      <div class="progress-dot"></div>
+    </div>
+
+    <div class="steps">
+      <div class="step-card">
+        <div class="step-number">1</div>
+        <h3>Dashboard</h3>
+        <p>Sua visão geral em tempo real com métricas importantes:</p>
+        <ul class="feature-list">
+          <li>Leads cadastrados este mês</li>
+          <li>Taxa de conversão</li>
+          <li>Agendamentos de hoje</li>
+          <li>Formalizações pendentes</li>
+        </ul>
+      </div>
+
+      <div class="step-card">
+        <div class="step-number">2</div>
+        <h3>Funil de Leads</h3>
+        <p>Acompanhe seus leads nas etapas:</p>
+        <ul class="feature-list">
+          <li>Análise (pré-cadastros)</li>
+          <li>Aprovado (análise confirmada)</li>
+          <li>Formalização (documentos)</li>
+          <li>Finalizado (clientes)</li>
+        </ul>
+      </div>
+
+      <div class="step-card">
+        <div class="step-number">3</div>
+        <h3>Ficha do Lead</h3>
+        <p>Dados completos de cada cliente:</p>
+        <ul class="feature-list">
+          <li>Informações pessoais</li>
+          <li>Histórico de contatos</li>
+          <li>Produto indicado</li>
+          <li>Google Drive integrado</li>
+        </ul>
+      </div>
+
+      <div class="step-card">
+        <div class="step-number">4</div>
+        <h3>Agendamentos</h3>
+        <p>Organize reuniões e consultorias:</p>
+        <ul class="feature-list">
+          <li>Calendário interativo</li>
+          <li>Solicitações de aprovação</li>
+          <li>Sincronização de equipe</li>
+          <li>Lembretes automáticos</li>
+        </ul>
+      </div>
+
+      <div class="step-card">
+        <div class="step-number">5</div>
+        <h3>Comissões</h3>
+        <p>Gestão de pagamentos (admin):</p>
+        <ul class="feature-list">
+          <li>Cálculo automático por lead</li>
+          <li>Status de pagamento</li>
+          <li>Relatórios por período</li>
+          <li>Filtros por consultor</li>
+        </ul>
+      </div>
+
+      <div class="step-card">
+        <div class="step-number">6</div>
+        <h3>Parceiros</h3>
+        <p>Terceirização de vendas (admin):</p>
+        <ul class="feature-list">
+          <li>Cadastro de parceiros</li>
+          <li>Atribuição de leads</li>
+          <li>Comissões por parceiro</li>
+          <li>Restrição de acesso</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="faq-section">
+      <h2>Perguntas Frequentes</h2>
+
+      <div class="faq-item" onclick="toggleFAQ(this)">
+        <div class="faq-question">Como criar um novo lead?</div>
+        <div class="faq-answer">
+          Clique em "Novo Lead" no Dashboard ou acesse "Novo Lead" no menu. Preencha os dados pessoais, renda bruta, produto indicado e banco. O lead será criado na etapa "Análise" do funil automaticamente.
+        </div>
+      </div>
+
+      <div class="faq-item" onclick="toggleFAQ(this)">
+        <div class="faq-question">Como funciona o sistema de permissões?</div>
+        <div class="faq-answer">
+          O MB Hub tem 3 tipos de acesso: <strong>Administrador</strong> (Márcia - acesso total), <strong>Usuário</strong> (colaboradores - acesso leitura/edição), <strong>Parceiro</strong> (externos - apenas seus leads). Cada role tem permissões específicas.
+        </div>
+      </div>
+
+      <div class="faq-item" onclick="toggleFAQ(this)">
+        <div class="faq-question">Como posso enviar autorização LGPD via WhatsApp?</div>
+        <div class="faq-answer">
+          Na ficha do lead, clique em "Enviar Autorização" na seção LGPD. Marque as autorizações necessárias e clique "Autorizar e Enviar". Depois clique "Enviar via WhatsApp" para compartilhar com o cliente.
+        </div>
+      </div>
+
+      <div class="faq-item" onclick="toggleFAQ(this)">
+        <div class="faq-question">Como criar um agendamento que requer aprovação?</div>
+        <div class="faq-answer">
+          Acesse "Agendamentos" e clique "Novo Agendamento". Preencha os dados e marque "Requer aprovação do administrador". A solicitação aparecerá no painel de "Solicitações Pendentes" do admin que poderá aprovar ou rejeitar.
+        </div>
+      </div>
+
+      <div class="faq-item" onclick="toggleFAQ(this)">
+        <div class="faq-question">Como gerar relatório de comissões?</div>
+        <div class="faq-answer">
+          Acesse "Comissões" no menu. Selecione o período (mês, trimestre, ano ou personalizado) e o consultor. Clique "Gerar Relatório" para exportar em PDF ou Excel (em desenvolvimento).
+        </div>
+      </div>
+
+      <div class="faq-item" onclick="toggleFAQ(this)">
+        <div class="faq-question">Posso editar o produto como "Outros"?</div>
+        <div class="faq-answer">
+          Sim! Ao selecionar "Outros (especificar)" no campo de Produto ou Banco, um campo de texto aparecerá. Descreva o produto/banco não listado. O sistema valida se está preenchido antes de salvar.
+        </div>
+      </div>
+
+      <div class="faq-item" onclick="toggleFAQ(this)">
+        <div class="faq-question">Como funciona a restrição de leads para parceiros?</div>
+        <div class="faq-answer">
+          Parceiros externos veem apenas os leads que eles mesmos cadastraram. No "Funil de Leads" e "Clientes", o sistema filtra automaticamente baseado no criador. Isso garante segurança e privacidade.
+        </div>
+      </div>
+
+      <div class="faq-item" onclick="toggleFAQ(this)">
+        <div class="faq-question">Onde estão armazenados os dados?</div>
+        <div class="faq-answer">
+          Todos os dados são armazenados no localStorage do seu navegador. Isso significa que as informações ficam no seu computador/dispositivo e são sincronizadas entre abas abertas. Não dependem de conexão com internet constante.
+        </div>
+      </div>
+    </div>
+
+    <div class="help-contact">
+      <h3>Precisa de ajuda?</h3>
+      <p>Dúvidas? Explore os recursos do sistema e aproveite ao máximo o MB Hub para gerenciar seus leads e clientes.</p>
+      <div class="help-buttons">
+        <a href="https://www.mbsolucoesfinanceiras.com.br" class="btn" target="_blank">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+          Site MB Soluções
+        </a>
+        <button class="btn" onclick="abrirChat()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          Chat com Admin
+        </button>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button class="btn btn-secondary" onclick="pularTutorial()">Pular Tutorial</button>
+      <button class="btn btn-primary" onclick="irParaDashboard()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        Ir para Dashboard
+      </button>
+    </div>
+  </div>
+
+  <script>
+    function toggleFAQ(element) {
+      element.classList.toggle('open');
+    }
+
+    function abrirChat() {
+      alert('Chat com admin (recurso futuro)\nEntrem em contato via WhatsApp: MB Soluções Financeiras');
+    }
+
+    function pularTutorial() {
+      localStorage.setItem('mb_hub_onboarding_concluido', 'true');
+      window.location.href = 'dashboard.html';
+    }
+
+    function irParaDashboard() {
+      localStorage.setItem('mb_hub_onboarding_concluido', 'true');
+      window.location.href = 'dashboard.html';
+    }
+
+    // Verificar se já fez onboarding
+    window.addEventListener('load', function() {
+      const jaConcluido = localStorage.getItem('mb_hub_onboarding_concluido');
+      if (jaConcluido) {
+        window.location.href = 'dashboard.html';
+      }
+    });
+  </script>
+</body>
+</html>

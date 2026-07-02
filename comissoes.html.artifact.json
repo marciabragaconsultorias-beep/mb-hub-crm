@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "kind": "html",
+  "title": "comissoes.html",
+  "entry": "comissoes.html",
+  "renderer": "html",
+  "status": "complete",
+  "exports": [
+    "html",
+    "pdf",
+    "zip"
+  ],
+  "createdAt": "2026-07-02T12:58:42.297Z",
+  "updatedAt": "2026-07-02T12:58:42.297Z",
+  "metadata": {
+    "inferred": true,
+    "reconciled": true
+  }
+}

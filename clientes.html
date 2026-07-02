@@ -1,0 +1,569 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Clientes — MB Hub</title>
+  <style>
+    :root {
+      --bg: #ffffff;
+      --surface: #f8f9fa;
+      --fg: #1a1a1a;
+      --muted: #6b7280;
+      --border: #e5e7eb;
+      --accent: #ca8c3f;
+      --accent-secondary: #141352;
+      --radius: 8px;
+      --font: 'Astra', system-ui, -apple-system, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { height: 100%; }
+    body {
+      min-height: 100%;
+      font-family: var(--font);
+      font-size: 15px;
+      line-height: 1.5;
+      color: var(--fg);
+      background: var(--surface);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Layout */
+    .app { display: flex; min-height: 100vh; }
+    .sidebar {
+      width: 240px;
+      background: var(--bg);
+      border-right: 1px solid var(--border);
+      padding: 24px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 32px;
+      flex-shrink: 0;
+    }
+    .main {
+      flex: 1;
+      padding: 24px;
+      overflow-x: hidden;
+    }
+
+    /* Sidebar */
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 8px;
+    }
+    .brand-logo {
+      width: 80px;
+      height: auto;
+    }
+    .brand h1 {
+      font-size: 18px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+    }
+
+    .nav { display: flex; flex-direction: column; gap: 4px; }
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 12px;
+      color: var(--fg);
+      text-decoration: none;
+      border-radius: var(--radius);
+      font-size: 14px;
+      font-weight: 500;
+      transition: background 0.15s;
+    }
+    .nav-item:hover { background: var(--surface); }
+    .nav-item.active {
+      background: var(--surface);
+      color: var(--accent);
+    }
+    .nav-icon {
+      width: 20px;
+      height: 20px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2;
+    }
+
+    .user {
+      margin-top: auto;
+      padding: 12px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .user-avatar {
+      width: 36px;
+      height: 36px;
+      background: var(--accent);
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      color: var(--bg);
+      font-weight: 600;
+      font-size: 14px;
+    }
+    .user-info {
+      flex: 1;
+      min-width: 0;
+    }
+    .user-name {
+      font-size: 14px;
+      font-weight: 500;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .user-role {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    /* Header */
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 32px;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .header h2 {
+      font-size: 28px;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+    }
+
+    .search-bar {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 16px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      flex: 1;
+      max-width: 400px;
+    }
+    .search-icon {
+      width: 20px;
+      height: 20px;
+      stroke: var(--muted);
+      fill: none;
+      stroke-width: 2;
+    }
+    .search-bar input {
+      flex: 1;
+      border: none;
+      outline: none;
+      font-family: var(--font);
+      font-size: 15px;
+      background: transparent;
+      color: var(--fg);
+    }
+    .search-bar input::placeholder {
+      color: var(--muted);
+    }
+
+    .filter-group {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .filter-btn {
+      padding: 8px 16px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      font-family: var(--font);
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--fg);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .filter-btn:hover {
+      border-color: var(--accent);
+    }
+    .filter-btn.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: var(--bg);
+    }
+
+    /* Table */
+    .table-container {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+
+    .table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .table thead {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .table th {
+      padding: 12px 16px;
+      text-align: left;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .table td {
+      padding: 16px;
+      border-bottom: 1px solid var(--border);
+      font-size: 14px;
+    }
+
+    .table tbody tr:last-child td {
+      border-bottom: none;
+    }
+
+    .table tbody tr:hover {
+      background: var(--surface);
+    }
+
+    .client-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .client-avatar {
+      width: 40px;
+      height: 40px;
+      background: var(--surface);
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      font-weight: 600;
+      font-size: 14px;
+      color: var(--accent);
+      flex-shrink: 0;
+    }
+
+    .client-details {
+      min-width: 0;
+    }
+
+    .client-name {
+      font-weight: 500;
+      color: var(--fg);
+      margin-bottom: 2px;
+    }
+
+    .client-email {
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 500;
+      white-space: nowrap;
+    }
+
+    .badge.success {
+      background: #d1fae5;
+      color: #065f46;
+    }
+
+    .value-cell {
+      font-weight: 600;
+      color: var(--accent);
+    }
+
+    .action-btn {
+      padding: 6px 12px;
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      font-family: var(--font);
+      font-size: 13px;
+      color: var(--fg);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .action-btn:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    /* Mobile */
+    @media (max-width: 768px) {
+      .sidebar {
+        position: fixed;
+        left: -240px;
+        top: 0;
+        bottom: 0;
+        z-index: 100;
+        transition: left 0.3s;
+      }
+      .sidebar.open { left: 0; }
+
+      .table-container {
+        overflow-x: auto;
+      }
+
+      .table {
+        min-width: 800px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="brand">
+        <img src="mr2km39w-IMG_3972.jpg" alt="MB Soluções Financeiras" class="brand-logo">
+        <h1>MB Hub</h1>
+      </div>
+
+      <nav class="nav">
+        <a href="dashboard.html" class="nav-item">
+          <svg class="nav-icon" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+          Dashboard
+        </a>
+        <a href="pipeline.html" class="nav-item">
+          <svg class="nav-icon" viewBox="0 0 24 24"><path d="M3 3h7v18H3z"/><path d="M14 3h7v9h-7z"/></svg>
+          Pipeline
+        </a>
+        <a href="clientes.html" class="nav-item active">
+          <svg class="nav-icon" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          Clientes
+        </a>
+        <a href="lead-detail.html" class="nav-item">
+          <svg class="nav-icon" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          Novo Lead
+        </a>
+      </nav>
+
+      <div class="user">
+        <div class="user-avatar">MB</div>
+        <div class="user-info">
+          <div class="user-name">Márcia Braga</div>
+          <div class="user-role">Administrador</div>
+        </div>
+      </div>
+    </aside>
+
+    <main class="main">
+      <div class="header">
+        <h2>Clientes</h2>
+        <div class="search-bar">
+          <svg class="search-icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          <input type="text" placeholder="Buscar por nome, CPF ou produto...">
+        </div>
+      </div>
+
+      <div class="filter-group" style="margin-bottom: 24px;">
+        <button class="filter-btn active">Todos (18)</button>
+        <button class="filter-btn">Crédito Pessoal (7)</button>
+        <button class="filter-btn">Consórcio (5)</button>
+        <button class="filter-btn">Financiamento (4)</button>
+        <button class="filter-btn">Cartão de Crédito (2)</button>
+      </div>
+
+      <div class="table-container">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Cliente</th>
+              <th>Produto</th>
+              <th>Banco</th>
+              <th>Valor</th>
+              <th>Finalizado em</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                <div class="client-info">
+                  <div class="client-avatar">AM</div>
+                  <div class="client-details">
+                    <div class="client-name">Ana Maria Santos</div>
+                    <div class="client-email">ana.santos@email.com</div>
+                  </div>
+                </div>
+              </td>
+              <td><span class="badge success">Crédito Pessoal</span></td>
+              <td>Banco do Brasil</td>
+              <td class="value-cell">R$ 15.000</td>
+              <td>24/06/2026</td>
+              <td><button class="action-btn">Ver detalhes</button></td>
+            </tr>
+
+            <tr>
+              <td>
+                <div class="client-info">
+                  <div class="client-avatar">CS</div>
+                  <div class="client-details">
+                    <div class="client-name">Carlos Silva</div>
+                    <div class="client-email">carlos.silva@email.com</div>
+                  </div>
+                </div>
+              </td>
+              <td><span class="badge success">Consórcio Automóvel</span></td>
+              <td>Itaú</td>
+              <td class="value-cell">R$ 45.000</td>
+              <td>23/06/2026</td>
+              <td><button class="action-btn">Ver detalhes</button></td>
+            </tr>
+
+            <tr>
+              <td>
+                <div class="client-info">
+                  <div class="client-avatar">MO</div>
+                  <div class="client-details">
+                    <div class="client-name">Mariana Oliveira</div>
+                    <div class="client-email">mariana.o@email.com</div>
+                  </div>
+                </div>
+              </td>
+              <td><span class="badge success">Financiamento Imobiliário</span></td>
+              <td>Caixa Econômica</td>
+              <td class="value-cell">R$ 280.000</td>
+              <td>20/06/2026</td>
+              <td><button class="action-btn">Ver detalhes</button></td>
+            </tr>
+
+            <tr>
+              <td>
+                <div class="client-info">
+                  <div class="client-avatar">RP</div>
+                  <div class="client-details">
+                    <div class="client-name">Roberto Pereira</div>
+                    <div class="client-email">roberto.p@email.com</div>
+                  </div>
+                </div>
+              </td>
+              <td><span class="badge success">Carta Contemplada</span></td>
+              <td>Santander</td>
+              <td class="value-cell">R$ 80.000</td>
+              <td>18/06/2026</td>
+              <td><button class="action-btn">Ver detalhes</button></td>
+            </tr>
+
+            <tr>
+              <td>
+                <div class="client-info">
+                  <div class="client-avatar">JC</div>
+                  <div class="client-details">
+                    <div class="client-name">Julia Costa</div>
+                    <div class="client-email">julia.costa@email.com</div>
+                  </div>
+                </div>
+              </td>
+              <td><span class="badge success">Consórcio Imóvel</span></td>
+              <td>Bradesco</td>
+              <td class="value-cell">R$ 200.000</td>
+              <td>15/06/2026</td>
+              <td><button class="action-btn">Ver detalhes</button></td>
+            </tr>
+
+            <tr>
+              <td>
+                <div class="client-info">
+                  <div class="client-avatar">FS</div>
+                  <div class="client-details">
+                    <div class="client-name">Fernando Santos</div>
+                    <div class="client-email">fernando.s@email.com</div>
+                  </div>
+                </div>
+              </td>
+              <td><span class="badge success">Crédito Pessoal</span></td>
+              <td>Inter</td>
+              <td class="value-cell">R$ 12.000</td>
+              <td>14/06/2026</td>
+              <td><button class="action-btn">Ver detalhes</button></td>
+            </tr>
+
+            <tr>
+              <td>
+                <div class="client-info">
+                  <div class="client-avatar">LC</div>
+                  <div class="client-details">
+                    <div class="client-name">Lucia Cardoso</div>
+                    <div class="client-email">lucia.cardoso@email.com</div>
+                  </div>
+                </div>
+              </td>
+              <td><span class="badge success">Consórcio Serviços</span></td>
+              <td>Sicoob</td>
+              <td class="value-cell">R$ 35.000</td>
+              <td>12/06/2026</td>
+              <td><button class="action-btn">Ver detalhes</button></td>
+            </tr>
+
+            <tr>
+              <td>
+                <div class="client-info">
+                  <div class="client-avatar">PM</div>
+                  <div class="client-details">
+                    <div class="client-name">Paulo Martins</div>
+                    <div class="client-email">paulo.m@email.com</div>
+                  </div>
+                </div>
+              </td>
+              <td><span class="badge success">Financiamento Imobiliário</span></td>
+              <td>Santander</td>
+              <td class="value-cell">R$ 320.000</td>
+              <td>10/06/2026</td>
+              <td><button class="action-btn">Ver detalhes</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    // Filtros
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+      btn.addEventListener('click', function() {
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+      });
+    });
+
+    // Busca
+    document.querySelector('.search-bar input').addEventListener('input', function(e) {
+      const term = e.target.value.toLowerCase();
+      document.querySelectorAll('.table tbody tr').forEach(row => {
+        const text = row.textContent.toLowerCase();
+        row.style.display = text.includes(term) ? '' : 'none';
+      });
+    });
+
+    // Ver detalhes
+    document.querySelectorAll('.action-btn').forEach(btn => {
+      btn.addEventListener('click', function() {
+        window.location.href = 'lead-detail.html';
+      });
+    });
+  </script>
+  <script src="auth.js"></script>
+</body>
+</html>

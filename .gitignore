@@ -1,0 +1,45 @@
+# Dependências
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Ambiente
+.env
+.env.local
+.env.*.local
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Build
+dist/
+build/
+.next/
+out/
+
+# Cache
+.cache/
+.parcel-cache/
+
+# Logs
+logs/
+*.log
+
+# Vercel
+.vercel
+
+# Backup
+*.bak
+*.backup
+
+# Temporários
+tmp/
+temp/
+
+# Configuração local
+local.json

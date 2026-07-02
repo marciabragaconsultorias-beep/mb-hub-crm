@@ -1,0 +1,738 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Agendamentos — MB Hub</title>
+  <style>
+    :root {
+      --bg: #ffffff;
+      --surface: #f8f9fa;
+      --fg: #1a1a1a;
+      --muted: #6b7280;
+      --border: #e5e7eb;
+      --accent: #ca8c3f;
+      --accent-secondary: #141352;
+      --radius: 8px;
+      --font: 'Astra', system-ui, -apple-system, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+      --success: #17a34a;
+      --warning: #f59e0b;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { height: 100%; }
+    body {
+      min-height: 100%;
+      font-family: var(--font);
+      font-size: 15px;
+      line-height: 1.5;
+      color: var(--fg);
+      background: var(--surface);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .app { display: flex; min-height: 100vh; }
+    .sidebar {
+      width: 240px;
+      background: var(--bg);
+      border-right: 1px solid var(--border);
+      padding: 24px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 32px;
+      flex-shrink: 0;
+    }
+    .main {
+      flex: 1;
+      padding: 24px;
+      overflow-x: hidden;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 8px;
+    }
+    .brand-logo { width: 80px; height: auto; }
+    .brand h1 { font-size: 18px; font-weight: 600; letter-spacing: -0.01em; }
+
+    .nav { display: flex; flex-direction: column; gap: 4px; }
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 12px;
+      color: var(--fg);
+      text-decoration: none;
+      border-radius: var(--radius);
+      font-size: 14px;
+      font-weight: 500;
+      transition: background 0.15s;
+    }
+    .nav-item:hover { background: var(--surface); }
+    .nav-item.active { background: var(--surface); color: var(--accent); }
+    .nav-icon {
+      width: 20px;
+      height: 20px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2;
+    }
+
+    .user {
+      margin-top: auto;
+      padding: 12px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .user-avatar {
+      width: 36px;
+      height: 36px;
+      background: var(--accent);
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      color: var(--bg);
+      font-weight: 600;
+      font-size: 14px;
+    }
+    .user-info { flex: 1; min-width: 0; }
+    .user-name {
+      font-size: 14px;
+      font-weight: 500;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .user-role { font-size: 12px; color: var(--muted); }
+
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 32px;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .header h2 { font-size: 28px; font-weight: 600; letter-spacing: -0.02em; }
+
+    .content-grid {
+      display: grid;
+      grid-template-columns: 1fr 320px;
+      gap: 24px;
+    }
+
+    .panel {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+    .panel-header {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .panel-header h3 { font-size: 16px; font-weight: 600; letter-spacing: -0.01em; }
+    .panel-body { padding: 20px; }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 16px;
+      border-radius: var(--radius);
+      font-size: 14px;
+      font-weight: 500;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      color: var(--fg);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .btn:hover { border-color: var(--muted); }
+    .btn-primary {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: var(--bg);
+    }
+    .btn-primary:hover { filter: brightness(0.95); }
+    .btn-sm { padding: 6px 12px; font-size: 13px; }
+    .btn-success { border-color: var(--success); color: var(--success); }
+    .btn-success:hover { background: rgba(23, 163, 74, 0.08); }
+    .btn-danger { border-color: #dc2626; color: #dc2626; }
+    .btn-danger:hover { background: rgba(220, 38, 38, 0.08); }
+
+    .calendar {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      margin-bottom: 24px;
+    }
+    .calendar-header {
+      padding: 16px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .calendar-header h3 { font-size: 14px; font-weight: 600; }
+    .calendar-header button { padding: 4px 8px; font-size: 12px; }
+
+    .calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 0;
+      padding: 12px;
+    }
+    .calendar-day-header {
+      padding: 8px 4px;
+      text-align: center;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+    .calendar-day {
+      aspect-ratio: 1;
+      padding: 8px 4px;
+      border: 1px solid var(--border);
+      text-align: center;
+      font-size: 12px;
+      cursor: pointer;
+      border-radius: 4px;
+      transition: all 0.15s;
+      position: relative;
+    }
+    .calendar-day:hover { background: var(--surface); }
+    .calendar-day.today { background: var(--accent); color: var(--bg); font-weight: 600; }
+    .calendar-day.has-events::after {
+      content: '';
+      position: absolute;
+      bottom: 2px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 4px;
+      height: 4px;
+      background: var(--accent);
+      border-radius: 50%;
+    }
+
+    .form-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; }
+    .form-label {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--muted);
+      letter-spacing: 0.02em;
+    }
+    .form-input {
+      padding: 10px 14px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      font-size: 14px;
+      font-family: inherit;
+      color: var(--fg);
+      background: var(--bg);
+      transition: border-color 0.15s;
+    }
+    .form-input:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+    select.form-input {
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%238c8c8c' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      padding-right: 40px;
+    }
+    textarea.form-input {
+      resize: vertical;
+      min-height: 80px;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal.active { display: flex; }
+    .modal-content {
+      background: var(--bg);
+      border-radius: var(--radius);
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      max-width: 500px;
+      width: 90%;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+    .modal-header {
+      padding: 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .modal-header h2 { font-size: 18px; font-weight: 600; }
+    .modal-close {
+      width: 32px;
+      height: 32px;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      border-radius: var(--radius);
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+      transition: border-color 0.15s;
+    }
+    .modal-close:hover { border-color: var(--muted); }
+    .modal-body { padding: 20px; }
+    .modal-footer {
+      padding: 16px 20px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      gap: 12px;
+      justify-content: flex-end;
+    }
+
+    .schedule-item {
+      display: flex;
+      gap: 12px;
+      padding: 12px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      margin-bottom: 12px;
+      align-items: flex-start;
+    }
+    .schedule-date {
+      width: 60px;
+      height: 60px;
+      background: var(--surface);
+      border-radius: var(--radius);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .schedule-date .day { font-size: 18px; font-weight: 600; line-height: 1; }
+    .schedule-date .month { font-size: 10px; color: var(--muted); text-transform: uppercase; }
+    .schedule-info { flex: 1; min-width: 0; }
+    .schedule-info strong { font-size: 14px; font-weight: 600; display: block; }
+    .schedule-info span { font-size: 13px; color: var(--muted); display: block; margin-top: 2px; }
+    .schedule-time { font-size: 13px; font-weight: 500; color: var(--fg); }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 500;
+      white-space: nowrap;
+    }
+    .badge-approved { background: #d1fae5; color: #065f46; }
+    .badge-pending { background: #fef3c7; color: #92400e; }
+    .badge-green { background: #d1fae5; color: var(--success); }
+    .badge-yellow { background: #fef3c7; color: #b45309; }
+
+    @media (max-width: 1024px) {
+      .content-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 768px) {
+      .sidebar { display: none; }
+      .main { padding: 16px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="brand">
+        <img src="mr2km39w-IMG_3972.jpg" alt="MB Hub" class="brand-logo">
+        <h1>MB Hub</h1>
+      </div>
+
+      <nav class="nav">
+        <a href="dashboard.html" class="nav-item">
+          <svg class="nav-icon" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+          Dashboard
+        </a>
+        <a href="pipeline.html" class="nav-item">
+          <svg class="nav-icon" viewBox="0 0 24 24"><path d="M3 3h7v18H3z"/><path d="M14 3h7v9h-7z"/></svg>
+          Funil de Leads
+        </a>
+        <a href="clientes.html" class="nav-item">
+          <svg class="nav-icon" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          Clientes
+        </a>
+        <a href="comissoes.html" class="nav-item">
+          <svg class="nav-icon" viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+          Comissões
+        </a>
+        <a href="parceiros.html" class="nav-item">
+          <svg class="nav-icon" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><path d="M20 8v6M23 11h-6"/></svg>
+          Parceiros
+        </a>
+        <a href="agendamentos.html" class="nav-item active">
+          <svg class="nav-icon" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          Agendamentos
+        </a>
+        <a href="lead-detail.html" class="nav-item">
+          <svg class="nav-icon" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          Novo Lead
+        </a>
+      </nav>
+
+      <div class="user" id="user-container">
+        <div class="user-avatar">MB</div>
+        <div class="user-info">
+          <div class="user-name">Márcia Braga</div>
+          <div class="user-role">Administrador</div>
+        </div>
+      </div>
+    </aside>
+
+    <main class="main">
+      <div class="header">
+        <h2>Agendamentos</h2>
+        <button class="btn btn-primary" onclick="abrirModalNovoAgendamento()">
+          <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Novo Agendamento
+        </button>
+      </div>
+
+      <div class="content-grid">
+        <div class="calendar-container">
+          <div class="calendar">
+            <div class="calendar-header">
+              <button class="btn btn-sm" onclick="mesAnterior()">&lt;</button>
+              <h3 id="mes-ano"></h3>
+              <button class="btn btn-sm" onclick="proximoMes()">&gt;</button>
+            </div>
+            <div class="calendar-grid" id="calendar-grid"></div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-header">
+              <h3>Agendamentos do Dia</h3>
+            </div>
+            <div class="panel-body">
+              <div id="agendamentos-dia"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="sidebar-right">
+          <div class="panel">
+            <div class="panel-header">
+              <h3>Solicitações Pendentes</h3>
+            </div>
+            <div class="panel-body" id="solicitacoes-pendentes" style="max-height: 600px; overflow-y: auto;">
+              <!-- Preenchido por JS -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Modal Novo Agendamento -->
+  <div class="modal" id="modal-novo-agendamento">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Novo Agendamento</h2>
+        <button class="modal-close" onclick="fecharModalNovoAgendamento()">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label">Com quem?</label>
+          <select class="form-input" id="agendamento-com-quem">
+            <option value="">Selecione a pessoa</option>
+            <option value="admin">Márcia Braga (Admin)</option>
+            <option value="usuario1">Usuário 1</option>
+            <option value="usuario2">Usuário 2</option>
+            <option value="usuario3">Usuário 3</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Data</label>
+          <input type="date" class="form-input" id="agendamento-data">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Horário</label>
+          <input type="time" class="form-input" id="agendamento-hora">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Tipo de encontro</label>
+          <select class="form-input" id="agendamento-tipo">
+            <option value="consultoria">Consultoria</option>
+            <option value="reuniao" selected>Reunião</option>
+            <option value="acompanhamento">Acompanhamento</option>
+            <option value="treinamento">Treinamento</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Assunto</label>
+          <input type="text" class="form-input" id="agendamento-assunto" placeholder="Descreva o assunto do encontro">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Observações</label>
+          <textarea class="form-input" id="agendamento-notas" placeholder="Notas adicionais (opcional)"></textarea>
+        </div>
+        <div class="form-group">
+          <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; margin-bottom: 0;">
+            <input type="checkbox" id="agendamento-requer-aprovacao" style="width: 18px; height: 18px; cursor: pointer; accent-color: var(--accent);">
+            <span class="form-label" style="margin-bottom: 0;">Requer aprovação do administrador</span>
+          </label>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn" onclick="fecharModalNovoAgendamento()">Cancelar</button>
+        <button class="btn btn-primary" onclick="salvarAgendamento()">Solicitar Agendamento</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let dataAtual = new Date();
+    let agendamentos = [];
+    let solicitacoes = [];
+
+    function carregarAgendamentos() {
+      const stored = localStorage.getItem('mb_hub_agendamentos');
+      agendamentos = stored ? JSON.parse(stored) : [];
+    }
+
+    function carregarSolicitacoes() {
+      const stored = localStorage.getItem('mb_hub_solicitacoes');
+      solicitacoes = stored ? JSON.parse(stored) : [];
+    }
+
+    function salvarAgendamentos() {
+      localStorage.setItem('mb_hub_agendamentos', JSON.stringify(agendamentos));
+    }
+
+    function salvarSolicitacoes() {
+      localStorage.setItem('mb_hub_solicitacoes', JSON.stringify(solicitacoes));
+    }
+
+    function abrirModalNovoAgendamento() {
+      document.getElementById('modal-novo-agendamento').classList.add('active');
+      const hoje = new Date().toISOString().split('T')[0];
+      document.getElementById('agendamento-data').value = hoje;
+    }
+
+    function fecharModalNovoAgendamento() {
+      document.getElementById('modal-novo-agendamento').classList.remove('active');
+      document.getElementById('agendamento-com-quem').value = '';
+      document.getElementById('agendamento-assunto').value = '';
+      document.getElementById('agendamento-notas').value = '';
+      document.getElementById('agendamento-requer-aprovacao').checked = false;
+    }
+
+    function salvarAgendamento() {
+      const comQuem = document.getElementById('agendamento-com-quem').value;
+      const data = document.getElementById('agendamento-data').value;
+      const hora = document.getElementById('agendamento-hora').value;
+      const assunto = document.getElementById('agendamento-assunto').value;
+      const requerAprovacao = document.getElementById('agendamento-requer-aprovacao').checked;
+
+      if (!comQuem || !data || !hora || !assunto) {
+        alert('Por favor, preencha todos os campos obrigatórios.');
+        return;
+      }
+
+      const agendamento = {
+        id: Date.now(),
+        comQuem,
+        data,
+        hora,
+        assunto,
+        notas: document.getElementById('agendamento-notas').value,
+        tipo: document.getElementById('agendamento-tipo').value,
+        criador: auth.getCurrentUser().email,
+        status: requerAprovacao ? 'pendente_aprovacao' : 'aprovado',
+        criadoEm: new Date().toISOString()
+      };
+
+      if (requerAprovacao) {
+        solicitacoes.push(agendamento);
+        salvarSolicitacoes();
+      } else {
+        agendamentos.push(agendamento);
+        salvarAgendamentos();
+      }
+
+      alert('Agendamento ' + (requerAprovacao ? 'solicitado' : 'criado') + ' com sucesso!');
+      fecharModalNovoAgendamento();
+      renderizarCalendario();
+      renderizarAgendamentosdia();
+      renderizarSolicitacoesPendentes();
+    }
+
+    function renderizarCalendario() {
+      const ano = dataAtual.getFullYear();
+      const mes = dataAtual.getMonth();
+
+      document.getElementById('mes-ano').textContent = new Date(ano, mes).toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
+
+      const grid = document.getElementById('calendar-grid');
+      grid.innerHTML = '';
+
+      const diasSemana = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sab'];
+      diasSemana.forEach(dia => {
+        const header = document.createElement('div');
+        header.className = 'calendar-day-header';
+        header.textContent = dia;
+        grid.appendChild(header);
+      });
+
+      const primeiroDia = new Date(ano, mes, 1).getDay();
+      const diasNoMes = new Date(ano, mes + 1, 0).getDate();
+
+      for (let i = 0; i < primeiroDia; i++) {
+        grid.appendChild(document.createElement('div'));
+      }
+
+      const hoje = new Date();
+      for (let dia = 1; dia <= diasNoMes; dia++) {
+        const dayEl = document.createElement('div');
+        dayEl.className = 'calendar-day';
+        dayEl.textContent = dia;
+
+        const dataVerif = new Date(ano, mes, dia);
+        if (dataVerif.toDateString() === hoje.toDateString()) {
+          dayEl.classList.add('today');
+        }
+
+        const agendsDoDia = agendamentos.filter(a => a.data === dataVerif.toISOString().split('T')[0]);
+        if (agendsDoDia.length > 0) {
+          dayEl.classList.add('has-events');
+        }
+
+        dayEl.onclick = () => selecionarDia(dataVerif.toISOString().split('T')[0]);
+        grid.appendChild(dayEl);
+      }
+    }
+
+    function selecionarDia(data) {
+      const input = document.getElementById('agendamento-data');
+      input.value = data;
+      renderizarAgendamentosdia(data);
+    }
+
+    function renderizarAgendamentosdia(dataEspecifica) {
+      const data = dataEspecifica || document.getElementById('agendamento-data').value;
+      const container = document.getElementById('agendamentos-dia');
+
+      const agendsDoDia = agendamentos.filter(a => a.data === data);
+
+      if (agendsDoDia.length === 0) {
+        container.innerHTML = '<p style="color: var(--muted); font-size: 13px;">Nenhum agendamento neste dia</p>';
+        return;
+      }
+
+      container.innerHTML = agendsDoDia.map(ag => `
+        <div class="schedule-item">
+          <div class="schedule-date">
+            <div class="day">${ag.hora.split(':')[0]}</div>
+            <div class="month">${ag.hora.split(':')[1]}</div>
+          </div>
+          <div class="schedule-info">
+            <strong>${ag.assunto}</strong>
+            <span>Com: ${ag.comQuem}</span>
+            <span style="margin-top: 4px;"><span class="badge badge-${ag.status === 'aprovado' ? 'approved' : 'pending'}">${ag.status === 'aprovado' ? 'Aprovado' : 'Pendente'}</span></span>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function renderizarSolicitacoesPendentes() {
+      const container = document.getElementById('solicitacoes-pendentes');
+      const minhasSolicitacoes = solicitacoes.filter(s => s.status === 'pendente_aprovacao');
+
+      if (minhasSolicitacoes.length === 0) {
+        container.innerHTML = '<p style="color: var(--muted); font-size: 13px;">Nenhuma solicitação pendente</p>';
+        return;
+      }
+
+      container.innerHTML = minhasSolicitacoes.map(sol => `
+        <div class="schedule-item" style="margin-bottom: 12px;">
+          <div class="schedule-date">
+            <div class="day">${new Date(sol.data).getDate()}</div>
+            <div class="month">${new Date(sol.data).toLocaleDateString('pt-BR', { month: 'short' }).toUpperCase()}</div>
+          </div>
+          <div class="schedule-info">
+            <strong>${sol.assunto}</strong>
+            <span>Com: ${sol.comQuem}</span>
+            <span style="margin-top: 6px; display: flex; gap: 4px;">
+              <button class="btn btn-sm btn-success" onclick="aprovarSolicitacao(${sol.id})">Aprovar</button>
+              <button class="btn btn-sm btn-danger" onclick="rejeitarSolicitacao(${sol.id})">Rejeitar</button>
+            </span>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function aprovarSolicitacao(id) {
+      const idx = solicitacoes.findIndex(s => s.id === id);
+      if (idx !== -1) {
+        const solicitacao = solicitacoes[idx];
+        solicitacao.status = 'aprovado';
+        agendamentos.push(solicitacao);
+        solicitacoes.splice(idx, 1);
+
+        salvarAgendamentos();
+        salvarSolicitacoes();
+        renderizarCalendario();
+        renderizarSolicitacoesPendentes();
+        alert('Agendamento aprovado!');
+      }
+    }
+
+    function rejeitarSolicitacao(id) {
+      const idx = solicitacoes.findIndex(s => s.id === id);
+      if (idx !== -1) {
+        solicitacoes.splice(idx, 1);
+        salvarSolicitacoes();
+        renderizarSolicitacoesPendentes();
+        alert('Solicitação rejeitada');
+      }
+    }
+
+    function mesAnterior() {
+      dataAtual.setMonth(dataAtual.getMonth() - 1);
+      renderizarCalendario();
+    }
+
+    function proximoMes() {
+      dataAtual.setMonth(dataAtual.getMonth() + 1);
+      renderizarCalendario();
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      carregarAgendamentos();
+      carregarSolicitacoes();
+      renderizarCalendario();
+      renderizarAgendamentosdia();
+      renderizarSolicitacoesPendentes();
+    });
+  </script>
+  <script src="auth.js"></script>
+</body>
+</html>

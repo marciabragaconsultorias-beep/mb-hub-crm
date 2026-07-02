@@ -1,0 +1,30 @@
+{
+  "name": "mb-hub-crm",
+  "version": "2.0.0",
+  "description": "CRM Multitenant para MB Soluções Financeiras",
+  "private": true,
+  "scripts": {
+    "build": "echo 'Build: Copy static files'",
+    "start": "python3 -m http.server 3000",
+    "dev": "python3 -m http.server 8000",
+    "lint": "echo 'Linting HTML/CSS/JS'",
+    "test": "echo 'Run tests'",
+    "deploy": "vercel deploy --prod"
+  },
+  "keywords": [
+    "crm",
+    "leads",
+    "financeiro",
+    "multitenant"
+  ],
+  "author": "MB Soluções Financeiras",
+  "license": "MIT",
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "dependencies": {},
+  "devDependencies": {},
+  "engines": {
+    "node": "16.x"
+  }
+}

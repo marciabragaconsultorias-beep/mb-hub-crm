@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>MB Hub — Soluções Financeiras</title>
+  <style>
+    :root {
+      --bg: #ffffff;
+      --surface: #f8f9fa;
+      --fg: #1a1a1a;
+      --muted: #6b7280;
+      --border: #e5e7eb;
+      --accent: #ca8c3f;
+      --accent-secondary: #141352;
+      --radius: 8px;
+      --font: 'Astra', system-ui, -apple-system, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      height: 100%;
+      font-family: var(--font);
+      font-size: 16px;
+      line-height: 1.5;
+      color: var(--fg);
+      background: var(--bg);
+      -webkit-font-smoothing: antialiased;
+    }
+    .launcher {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      gap: 48px;
+    }
+    .logo {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+    }
+    .logo-img {
+      width: 120px;
+      height: auto;
+    }
+    .logo h1 {
+      font-size: 24px;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+    }
+    .logo p {
+      color: var(--muted);
+      font-size: 14px;
+    }
+    .screen-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+      width: 100%;
+      max-width: 960px;
+    }
+    .screen-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+      text-decoration: none;
+      color: var(--fg);
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+    .screen-card:hover {
+      border-color: var(--accent);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+    }
+    .screen-card-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+    .screen-card-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: var(--radius);
+      background: var(--bg);
+      border: 1px solid var(--border);
+      display: grid;
+      place-items: center;
+      flex-shrink: 0;
+    }
+    .screen-card-icon img {
+      width: 32px;
+      height: auto;
+    }
+    .screen-card h2 {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      letter-spacing: -0.01em;
+    }
+    .screen-card p {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+    .badge {
+      display: inline-block;
+      background: var(--accent);
+      color: var(--bg);
+      font-size: 11px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 4px;
+      margin-bottom: 12px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+    @media (max-width: 600px) {
+      .screen-grid {
+        grid-template-columns: 1fr;
+      }
+      .logo h1 {
+        font-size: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="launcher">
+    <div class="logo">
+      <img src="mr2km39w-IMG_3972.jpg" alt="MB Soluções Financeiras" class="logo-img">
+      <h1>MB Hub</h1>
+      <p>Sistema de gestão de leads e clientes</p>
+    </div>
+
+    <div class="screen-grid">
+      <a href="login.html" class="screen-card">
+        <span class="badge">Entrada</span>
+        <div class="screen-card-header">
+          <div class="screen-card-icon">
+            <img src="mr2km39w-IMG_3972.jpg" alt="MB">
+          </div>
+          <h2 style="margin-bottom: 0;">Login</h2>
+        </div>
+        <p>Acesso seguro ao sistema com controle de usuários e permissões.</p>
+      </a>
+
+      <a href="dashboard.html" class="screen-card">
+        <span class="badge">Principal</span>
+        <h2>Dashboard</h2>
+        <p>Visão geral de métricas, conversões e agendamentos do dia.</p>
+      </a>
+
+      <a href="pipeline.html" class="screen-card">
+        <h2>Funil de Leads</h2>
+        <p>Kanban com etapas: Análise, Aprovado, Formalização e Finalizado.</p>
+      </a>
+
+      <a href="clientes.html" class="screen-card">
+        <h2>Clientes</h2>
+        <p>Listagem de todos os clientes que finalizaram algum produto.</p>
+      </a>
+
+      <a href="lead-detail.html" class="screen-card">
+        <h2>Ficha do Lead</h2>
+        <p>Dados completos, histórico de interações, produto indicado e WhatsApp.</p>
+      </a>
+
+      <a href="agendamentos.html" class="screen-card">
+        <h2>Agendamentos</h2>
+        <p>Calendário de reuniões, consultorias e acompanhamentos com aprovação de admin.</p>
+      </a>
+
+      <a href="comissoes.html" class="screen-card">
+        <span class="badge">Admin</span>
+        <h2>Comissões</h2>
+        <p>Gestão de comissões por leads, statusde pagamento e relatórios.</p>
+      </a>
+
+      <a href="parceiros.html" class="screen-card">
+        <span class="badge">Admin</span>
+        <h2>Parceiros</h2>
+        <p>Cadastro e gestão de parceiros externos para terceirização de vendas.</p>
+      </a>
+    </div>
+  </main>
+</body>
+</html>

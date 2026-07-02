@@ -1,0 +1,559 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Dashboard — MB Hub</title>
+  <style>
+    :root {
+      --bg: #ffffff;
+      --surface: #f8f9fa;
+      --fg: #1a1a1a;
+      --muted: #6b7280;
+      --border: #e5e7eb;
+      --accent: #ca8c3f;
+      --accent-secondary: #141352;
+      --radius: 8px;
+      --font: 'Astra', system-ui, -apple-system, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { height: 100%; }
+    body {
+      min-height: 100%;
+      font-family: var(--font);
+      font-size: 15px;
+      line-height: 1.5;
+      color: var(--fg);
+      background: var(--surface);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Layout */
+    .app { display: flex; min-height: 100vh; }
+    .sidebar {
+      width: 240px;
+      background: var(--bg);
+      border-right: 1px solid var(--border);
+      padding: 24px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 32px;
+      flex-shrink: 0;
+    }
+    .main {
+      flex: 1;
+      padding: 24px;
+      overflow-x: hidden;
+    }
+
+    /* Sidebar */
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      color: var(--fg);
+    }
+    .brand-mark {
+      width: 40px;
+      height: 40px;
+      background: var(--accent);
+      border-radius: var(--radius);
+      display: grid;
+      place-items: center;
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--bg);
+    }
+    .brand span {
+      font-size: 18px;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+    }
+    .nav { display: flex; flex-direction: column; gap: 4px; }
+    .nav a {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 12px;
+      border-radius: var(--radius);
+      text-decoration: none;
+      color: var(--fg);
+      font-size: 14px;
+      font-weight: 500;
+      transition: background 0.15s;
+    }
+    .nav a:hover { background: var(--surface); }
+    .nav a.active { background: var(--surface); }
+    .nav svg { width: 20px; height: 20px; stroke: currentColor; fill: none; stroke-width: 1.8; }
+
+    .user-menu {
+      margin-top: auto;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px;
+      border-radius: var(--radius);
+      background: var(--surface);
+    }
+    .avatar {
+      width: 36px;
+      height: 36px;
+      background: var(--border);
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--muted);
+    }
+    .user-info { flex: 1; min-width: 0; }
+    .user-info strong { display: block; font-size: 13px; font-weight: 600; }
+    .user-info span { font-size: 12px; color: var(--muted); }
+
+    /* Header */
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 24px;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .header h1 {
+      font-size: 24px;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+    }
+    .header-actions { display: flex; gap: 12px; }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 16px;
+      border-radius: var(--radius);
+      font-size: 14px;
+      font-weight: 500;
+      text-decoration: none;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      color: var(--fg);
+      cursor: pointer;
+      transition: border-color 0.15s, background 0.15s;
+    }
+    .btn:hover { border-color: var(--muted); }
+    .btn-primary {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: var(--bg);
+    }
+    .btn-primary:hover { filter: brightness(0.95); border-color: var(--accent); }
+    .btn svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2; }
+
+    /* Stats Grid */
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    .stat-card {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+    }
+    .stat-card .label {
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 8px;
+      letter-spacing: 0.02em;
+    }
+    .stat-card .value {
+      font-size: 32px;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      font-variant-numeric: tabular-nums;
+    }
+    .stat-card .change {
+      font-size: 13px;
+      margin-top: 8px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .stat-card .change.up { color: var(--accent); }
+    .stat-card .change.down { color: var(--accent-secondary); }
+
+    /* Content Grid */
+    .content-grid {
+      display: grid;
+      grid-template-columns: 1fr 360px;
+      gap: 24px;
+    }
+    .panel {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+    .panel-header {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .panel-header h2 {
+      font-size: 16px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+    }
+    .panel-body { padding: 16px 20px; }
+
+    /* Pipeline Mini */
+    .pipeline-mini {
+      display: flex;
+      gap: 12px;
+      padding: 16px 20px;
+    }
+    .pipeline-stage {
+      flex: 1;
+      text-align: center;
+      padding: 16px 8px;
+      background: var(--surface);
+      border-radius: var(--radius);
+    }
+    .pipeline-stage .count {
+      font-size: 28px;
+      font-weight: 600;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: -0.02em;
+    }
+    .pipeline-stage .name {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 4px;
+      letter-spacing: 0.02em;
+    }
+
+    /* Recent Leads */
+    .lead-list { list-style: none; }
+    .lead-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .lead-item:last-child { border-bottom: 0; }
+    .lead-avatar {
+      width: 40px;
+      height: 40px;
+      background: var(--surface);
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--muted);
+    }
+    .lead-info { flex: 1; min-width: 0; }
+    .lead-info strong {
+      display: block;
+      font-size: 14px;
+      font-weight: 600;
+    }
+    .lead-info span {
+      font-size: 13px;
+      color: var(--muted);
+    }
+    .lead-origin {
+      font-size: 11px;
+      padding: 4px 8px;
+      background: var(--surface);
+      border-radius: 4px;
+      color: var(--muted);
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    /* Agenda */
+    .agenda-item {
+      display: flex;
+      gap: 12px;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .agenda-item:last-child { border-bottom: 0; }
+    .agenda-time {
+      width: 56px;
+      font-size: 13px;
+      font-weight: 600;
+      font-variant-numeric: tabular-nums;
+      color: var(--muted);
+    }
+    .agenda-content { flex: 1; }
+    .agenda-content strong {
+      display: block;
+      font-size: 14px;
+      font-weight: 600;
+    }
+    .agenda-content span {
+      font-size: 13px;
+      color: var(--muted);
+    }
+    .agenda-type {
+      font-size: 11px;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+    .agenda-type.consultoria { background: rgba(37,211,102,0.12); color: #1a9d50; }
+    .agenda-type.reuniao { background: rgba(217,83,79,0.12); color: #c9302c; }
+
+    /* Responsive */
+    @media (max-width: 1200px) {
+      .stats { grid-template-columns: repeat(2, 1fr); }
+      .content-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 768px) {
+      .sidebar { display: none; }
+      .main { padding: 16px; }
+      .stats { grid-template-columns: 1fr 1fr; }
+      .pipeline-mini { flex-wrap: wrap; }
+      .pipeline-stage { min-width: calc(50% - 6px); }
+    }
+    @media (max-width: 480px) {
+      .stats { grid-template-columns: 1fr; }
+      .header { flex-direction: column; align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <a href="index.html" class="brand">
+        <img src="mr2km39w-IMG_3972.jpg" alt="MB" style="width: 80px; height: auto;">
+        <span>MB Hub</span>
+      </a>
+
+      <nav class="nav">
+        <a href="dashboard.html" class="active">
+          <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+          Dashboard
+        </a>
+        <a href="pipeline.html">
+          <svg viewBox="0 0 24 24"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+          Pipeline
+        </a>
+        <a href="clientes.html">
+          <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          Clientes
+        </a>
+        <a href="lead-detail.html">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-6 8-6s8 2 8 6"/></svg>
+          Novo Lead
+        </a>
+        <a href="comissoes.html">
+          <svg viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+          Comissões
+        </a>
+        <a href="parceiros.html">
+          <svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><path d="M20 8v6M23 11h-6"/></svg>
+          Parceiros
+        </a>
+        <a href="agendamentos.html">
+          <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          Agendamentos
+        </a>
+      </nav>
+
+      <div class="user-menu">
+        <div class="avatar">MC</div>
+        <div class="user-info">
+          <strong>Márcia Braga</strong>
+          <span>Administrador</span>
+        </div>
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="header">
+        <h1>Dashboard</h1>
+        <div class="header-actions">
+          <button class="btn">
+            <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+            Exportar
+          </button>
+          <a href="lead-detail.html" class="btn btn-primary">
+            <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+            Novo Lead
+          </a>
+        </div>
+      </header>
+
+      <section class="stats">
+        <div class="stat-card">
+          <div class="label">Leads este mês</div>
+          <div class="value">127</div>
+          <div class="change up">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 15l-6-6-6 6"/></svg>
+            +12% vs. mês anterior
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="label">Taxa de conversão</div>
+          <div class="value">34%</div>
+          <div class="change up">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 15l-6-6-6 6"/></svg>
+            +5% vs. mês anterior
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="label">Consultorias hoje</div>
+          <div class="value">8</div>
+          <div class="change">—</div>
+        </div>
+        <div class="stat-card">
+          <div class="label">Formalizações pendentes</div>
+          <div class="value">14</div>
+          <div class="change down">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+            3 aguardando documentos
+          </div>
+        </div>
+      </section>
+
+      <section class="panel" style="margin-bottom: 24px;">
+        <div class="panel-header">
+          <h2>Funil de Leads</h2>
+          <a href="pipeline.html" class="btn" style="padding: 6px 12px; font-size: 13px;">Ver completo</a>
+        </div>
+        <div class="pipeline-mini">
+          <div class="pipeline-stage">
+            <div class="count">23</div>
+            <div class="name">Análise</div>
+          </div>
+          <div class="pipeline-stage">
+            <div class="count">18</div>
+            <div class="name">Aprovação</div>
+          </div>
+          <div class="pipeline-stage">
+            <div class="count">14</div>
+            <div class="name">Formalização</div>
+          </div>
+          <div class="pipeline-stage">
+            <div class="count">72</div>
+            <div class="name">Finalizado</div>
+          </div>
+        </div>
+      </section>
+
+      <div class="content-grid">
+        <section class="panel">
+          <div class="panel-header">
+            <h2>Leads recentes</h2>
+          </div>
+          <div class="panel-body">
+            <ul class="lead-list">
+              <li class="lead-item">
+                <div class="lead-avatar">JC</div>
+                <div class="lead-info">
+                  <strong>João Carlos Silva</strong>
+                  <span>Crédito Consignado · R$ 45.000</span>
+                </div>
+                <span class="lead-origin">WhatsApp</span>
+              </li>
+              <li class="lead-item">
+                <div class="lead-avatar">MF</div>
+                <div class="lead-info">
+                  <strong>Maria Fernanda Souza</strong>
+                  <span>Financiamento Imobiliário · R$ 320.000</span>
+                </div>
+                <span class="lead-origin">Instagram</span>
+              </li>
+              <li class="lead-item">
+                <div class="lead-avatar">PA</div>
+                <div class="lead-info">
+                  <strong>Pedro Augusto Lima</strong>
+                  <span>Portabilidade · R$ 28.000</span>
+                </div>
+                <span class="lead-origin">Indicação</span>
+              </li>
+              <li class="lead-item">
+                <div class="lead-avatar">AS</div>
+                <div class="lead-info">
+                  <strong>Ana Santos Oliveira</strong>
+                  <span>Crédito Pessoal · R$ 15.000</span>
+                </div>
+                <span class="lead-origin">Tráfego</span>
+              </li>
+              <li class="lead-item">
+                <div class="lead-avatar">RC</div>
+                <div class="lead-info">
+                  <strong>Roberto Costa Mendes</strong>
+                  <span>Antecipação FGTS · R$ 8.500</span>
+                </div>
+                <span class="lead-origin">Site</span>
+              </li>
+            </ul>
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-header">
+            <h2>Agenda de hoje</h2>
+          </div>
+          <div class="panel-body">
+            <div class="agenda-item">
+              <div class="agenda-time">09:00</div>
+              <div class="agenda-content">
+                <strong>Maria Fernanda Souza</strong>
+                <span>Análise de documentos</span>
+              </div>
+              <span class="agenda-type consultoria">Consultoria</span>
+            </div>
+            <div class="agenda-item">
+              <div class="agenda-time">10:30</div>
+              <div class="agenda-content">
+                <strong>Pedro Augusto Lima</strong>
+                <span>Apresentação de proposta</span>
+              </div>
+              <span class="agenda-type reuniao">Reunião</span>
+            </div>
+            <div class="agenda-item">
+              <div class="agenda-time">14:00</div>
+              <div class="agenda-content">
+                <strong>João Carlos Silva</strong>
+                <span>Primeiro atendimento</span>
+              </div>
+              <span class="agenda-type consultoria">Consultoria</span>
+            </div>
+            <div class="agenda-item">
+              <div class="agenda-time">15:30</div>
+              <div class="agenda-content">
+                <strong>Ana Santos Oliveira</strong>
+                <span>Assinatura de contrato</span>
+              </div>
+              <span class="agenda-type reuniao">Reunião</span>
+            </div>
+            <div class="agenda-item">
+              <div class="agenda-time">17:00</div>
+              <div class="agenda-content">
+                <strong>Roberto Costa Mendes</strong>
+                <span>Coleta de documentos</span>
+              </div>
+              <span class="agenda-type consultoria">Consultoria</span>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+  <script src="auth.js"></script>
+</body>
+</html>

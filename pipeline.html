@@ -1,0 +1,645 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Funil de Vendas — MB Hub</title>
+  <style>
+    :root {
+      --bg: #ffffff;
+      --surface: #f8f9fa;
+      --fg: #1a1a1a;
+      --muted: #6b7280;
+      --border: #e5e7eb;
+      --accent: #ca8c3f;
+      --accent-secondary: #141352;
+      --radius: 8px;
+      --font: 'Astra', system-ui, -apple-system, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { height: 100%; }
+    body {
+      min-height: 100%;
+      font-family: var(--font);
+      font-size: 15px;
+      line-height: 1.5;
+      color: var(--fg);
+      background: var(--surface);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Layout */
+    .app { display: flex; min-height: 100vh; }
+    .sidebar {
+      width: 240px;
+      background: var(--bg);
+      border-right: 1px solid var(--border);
+      padding: 24px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 32px;
+      flex-shrink: 0;
+    }
+    .main {
+      flex: 1;
+      padding: 24px;
+      overflow-x: auto;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Sidebar */
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      color: var(--fg);
+    }
+    .brand-mark {
+      width: 40px;
+      height: 40px;
+      background: var(--accent);
+      border-radius: var(--radius);
+      display: grid;
+      place-items: center;
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--bg);
+    }
+    .brand span {
+      font-size: 18px;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+    }
+    .nav { display: flex; flex-direction: column; gap: 4px; }
+    .nav a {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 12px;
+      border-radius: var(--radius);
+      text-decoration: none;
+      color: var(--fg);
+      font-size: 14px;
+      font-weight: 500;
+      transition: background 0.15s;
+    }
+    .nav a:hover { background: var(--surface); }
+    .nav a.active { background: var(--surface); }
+    .nav svg { width: 20px; height: 20px; stroke: currentColor; fill: none; stroke-width: 1.8; }
+
+    .user-menu {
+      margin-top: auto;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px;
+      border-radius: var(--radius);
+      background: var(--surface);
+    }
+    .avatar {
+      width: 36px;
+      height: 36px;
+      background: var(--border);
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--muted);
+    }
+    .user-info { flex: 1; min-width: 0; }
+    .user-info strong { display: block; font-size: 13px; font-weight: 600; }
+    .user-info span { font-size: 12px; color: var(--muted); }
+
+    /* Header */
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 24px;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .header h1 {
+      font-size: 24px;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+    }
+    .header-actions { display: flex; gap: 12px; align-items: center; }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 16px;
+      border-radius: var(--radius);
+      font-size: 14px;
+      font-weight: 500;
+      text-decoration: none;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      color: var(--fg);
+      cursor: pointer;
+      transition: border-color 0.15s, background 0.15s;
+    }
+    .btn:hover { border-color: var(--muted); }
+    .btn-primary {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: var(--bg);
+    }
+    .btn-primary:hover { filter: brightness(0.95); border-color: var(--accent); }
+    .btn svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2; }
+
+    /* Filters */
+    .filters {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .filter-btn {
+      padding: 6px 12px;
+      border-radius: var(--radius);
+      font-size: 13px;
+      font-weight: 500;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      color: var(--muted);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .filter-btn:hover { border-color: var(--muted); color: var(--fg); }
+    .filter-btn.active { border-color: var(--fg); color: var(--fg); background: var(--bg); }
+
+    /* Kanban */
+    .kanban {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      flex: 1;
+      min-height: 0;
+    }
+    .kanban-column {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      display: flex;
+      flex-direction: column;
+      min-height: 500px;
+    }
+    .column-header {
+      padding: 16px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .column-header h2 {
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+    }
+    .column-count {
+      font-size: 12px;
+      font-weight: 600;
+      padding: 2px 8px;
+      background: var(--surface);
+      border-radius: 4px;
+      color: var(--muted);
+      font-variant-numeric: tabular-nums;
+    }
+    .column-body {
+      flex: 1;
+      padding: 12px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    /* Lead Card */
+    .lead-card {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px;
+      cursor: grab;
+      transition: box-shadow 0.15s, border-color 0.15s;
+      text-decoration: none;
+      color: var(--fg);
+      display: block;
+    }
+    .lead-card:hover {
+      border-color: var(--accent);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+    }
+    .lead-card:active { cursor: grabbing; }
+    .lead-card-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+    .lead-card-name {
+      font-size: 14px;
+      font-weight: 600;
+      line-height: 1.3;
+    }
+    .lead-card-origin {
+      font-size: 10px;
+      padding: 3px 6px;
+      background: var(--surface);
+      border-radius: 4px;
+      color: var(--muted);
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      flex-shrink: 0;
+    }
+    .lead-card-product {
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+    .lead-card-value {
+      font-size: 15px;
+      font-weight: 600;
+      font-variant-numeric: tabular-nums;
+      margin-bottom: 10px;
+    }
+    .lead-card-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-top: 10px;
+      border-top: 1px solid var(--border);
+    }
+    .lead-card-date {
+      font-size: 12px;
+      color: var(--muted);
+      font-variant-numeric: tabular-nums;
+    }
+    .lead-card-entry-date {
+      font-size: 11px;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      margin-bottom: 10px;
+    }
+    .lead-card-entry-date svg {
+      width: 12px;
+      height: 12px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2;
+    }
+    .lead-card-whatsapp {
+      width: 24px;
+      height: 24px;
+      background: var(--accent);
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+    }
+    .lead-card-whatsapp svg {
+      width: 14px;
+      height: 14px;
+      stroke: var(--bg);
+      fill: none;
+      stroke-width: 2;
+    }
+    .lead-card-priority {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .lead-card-priority.high { background: var(--accent-secondary); }
+    .lead-card-priority.medium { background: #f0ad4e; }
+    .lead-card-priority.low { background: var(--border); }
+
+    /* Responsive */
+    @media (max-width: 1200px) {
+      .kanban { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 768px) {
+      .sidebar { display: none; }
+      .main { padding: 16px; }
+      .kanban { grid-template-columns: 1fr; }
+      .kanban-column { min-height: 300px; }
+    }
+    @media (max-width: 480px) {
+      .header { flex-direction: column; align-items: flex-start; }
+      .filters { width: 100%; overflow-x: auto; flex-wrap: nowrap; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <a href="index.html" class="brand">
+        <img src="mr2km39w-IMG_3972.jpg" alt="MB" style="width: 80px; height: auto;">
+        <span>MB Hub</span>
+      </a>
+
+      <nav class="nav">
+        <a href="dashboard.html">
+          <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+          Dashboard
+        </a>
+        <a href="pipeline.html" class="active">
+          <svg viewBox="0 0 24 24"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+          Funil de Vendas
+        </a>
+        <a href="clientes.html">
+          <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          Clientes
+        </a>
+        <a href="lead-detail.html">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-6 8-6s8 2 8 6"/></svg>
+          Novo Lead
+        </a>
+        <a href="agendamentos.html">
+          <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18M8 2v4M16 2v4"/></svg>
+          Agendamentos
+        </a>
+        <a href="comissoes.html">
+          <svg viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+          Comissões
+        </a>
+        <a href="parceiros.html">
+          <svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><path d="M20 8v6M23 11h-6"/></svg>
+          Parceiros
+        </a>
+      </nav>
+
+      <div class="user-menu">
+        <div class="avatar">MC</div>
+        <div class="user-info">
+          <strong>Márcia Braga</strong>
+          <span>Administrador</span>
+        </div>
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="header">
+        <h1>Funil de Vendas</h1>
+        <div class="header-actions">
+          <div class="filters">
+            <button class="filter-btn active">Todos</button>
+            <button class="filter-btn">WhatsApp</button>
+            <button class="filter-btn">Instagram</button>
+            <button class="filter-btn">Indicação</button>
+            <button class="filter-btn">Tráfego</button>
+            <button class="filter-btn">Site</button>
+          </div>
+          <a href="lead-detail.html" class="btn btn-primary">
+            <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+            Novo Lead
+          </a>
+        </div>
+      </header>
+
+      <div class="kanban">
+        <div class="kanban-column">
+          <div class="column-header">
+            <h2>Análise</h2>
+            <span class="column-count">23</span>
+          </div>
+          <div class="column-body">
+            <a href="lead-detail.html" class="lead-card">
+              <div class="lead-card-header">
+                <span class="lead-card-name">João Carlos Silva</span>
+                <span class="lead-card-origin">WhatsApp</span>
+              </div>
+              <div class="lead-card-entry-date">
+                <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18M8 2v4M16 2v4"/></svg>
+                Entrada: 01/07/2026
+              </div>
+              <div class="lead-card-product">Crédito Consignado</div>
+              <div class="lead-card-value">R$ 45.000</div>
+              <div class="lead-card-footer">
+                <span class="lead-card-date">Atualizado há 2h</span>
+                <div class="lead-card-whatsapp">
+                  <svg viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+                </div>
+              </div>
+            </a>
+            <a href="lead-detail.html" class="lead-card">
+              <div class="lead-card-header">
+                <span class="lead-card-name">Carla Mendes Rocha</span>
+                <span class="lead-card-origin">Instagram</span>
+              </div>
+              <div class="lead-card-entry-date">
+                <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18M8 2v4M16 2v4"/></svg>
+                Entrada: 30/06/2026
+              </div>
+              <div class="lead-card-product">Financiamento Veicular</div>
+              <div class="lead-card-value">R$ 52.000</div>
+              <div class="lead-card-footer">
+                <span class="lead-card-date">Atualizado há 5h</span>
+                <div class="lead-card-whatsapp">
+                  <svg viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+                </div>
+              </div>
+            </a>
+            <a href="lead-detail.html" class="lead-card">
+              <div class="lead-card-header">
+                <span class="lead-card-name">Fernando Alves</span>
+                <span class="lead-card-origin">Tráfego</span>
+              </div>
+              <div class="lead-card-entry-date">
+                <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18M8 2v4M16 2v4"/></svg>
+                Entrada: 29/06/2026
+              </div>
+              <div class="lead-card-product">Crédito Pessoal</div>
+              <div class="lead-card-value">R$ 18.000</div>
+              <div class="lead-card-footer">
+                <span class="lead-card-date">Atualizado ontem</span>
+                <div class="lead-card-whatsapp">
+                  <svg viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+                </div>
+              </div>
+            </a>
+          </div>
+        </div>
+
+        <div class="kanban-column">
+          <div class="column-header">
+            <h2>Aprovado</h2>
+            <span class="column-count">18</span>
+          </div>
+          <div class="column-body">
+            <a href="lead-detail.html" class="lead-card">
+              <div class="lead-card-header">
+                <span class="lead-card-name">Maria Fernanda Souza</span>
+                <span class="lead-card-origin">Indicação</span>
+              </div>
+              <div class="lead-card-entry-date">
+                <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18M8 2v4M16 2v4"/></svg>
+                Entrada: 25/06/2026
+              </div>
+              <div class="lead-card-product">Financiamento Imobiliário</div>
+              <div class="lead-card-value">R$ 320.000</div>
+              <div class="lead-card-footer">
+                <span class="lead-card-date">Atualizado há 1 dia</span>
+                <div class="lead-card-whatsapp">
+                  <svg viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+                </div>
+              </div>
+            </a>
+            <a href="lead-detail.html" class="lead-card">
+              <div class="lead-card-header">
+                <span class="lead-card-name">Ricardo Pereira</span>
+                <span class="lead-card-origin">Site</span>
+              </div>
+              <div class="lead-card-entry-date">
+                <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18M8 2v4M16 2v4"/></svg>
+                Entrada: 22/06/2026
+              </div>
+              <div class="lead-card-product">Portabilidade</div>
+              <div class="lead-card-value">R$ 65.000</div>
+              <div class="lead-card-footer">
+                <span class="lead-card-date">Atualizado há 2 dias</span>
+                <div class="lead-card-whatsapp">
+                  <svg viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+                </div>
+              </div>
+            </a>
+          </div>
+        </div>
+
+        <div class="kanban-column">
+          <div class="column-header">
+            <h2>Formalização</h2>
+            <span class="column-count">14</span>
+          </div>
+          <div class="column-body">
+            <a href="lead-detail.html" class="lead-card">
+              <div class="lead-card-header">
+                <span class="lead-card-name">Pedro Augusto Lima</span>
+                <span class="lead-card-origin">WhatsApp</span>
+              </div>
+              <div class="lead-card-entry-date">
+                <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18M8 2v4M16 2v4"/></svg>
+                Entrada: 20/06/2026
+              </div>
+              <div class="lead-card-product">Portabilidade</div>
+              <div class="lead-card-value">R$ 28.000</div>
+              <div class="lead-card-footer">
+                <span class="lead-card-date">Atualizado há 3 dias</span>
+                <div class="lead-card-whatsapp">
+                  <svg viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+                </div>
+              </div>
+            </a>
+            <a href="lead-detail.html" class="lead-card">
+              <div class="lead-card-header">
+                <span class="lead-card-name">Juliana Costa</span>
+                <span class="lead-card-origin">Indicação</span>
+              </div>
+              <div class="lead-card-entry-date">
+                <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18M8 2v4M16 2v4"/></svg>
+                Entrada: 18/06/2026
+              </div>
+              <div class="lead-card-product">Crédito Consignado</div>
+              <div class="lead-card-value">R$ 38.000</div>
+              <div class="lead-card-footer">
+                <span class="lead-card-date">Atualizado há 4 dias</span>
+                <div class="lead-card-whatsapp">
+                  <svg viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+                </div>
+              </div>
+            </a>
+          </div>
+        </div>
+
+        <div class="kanban-column">
+          <div class="column-header">
+            <h2>Finalizado</h2>
+            <span class="column-count">72</span>
+          </div>
+          <div class="column-body">
+            <a href="lead-detail.html" class="lead-card">
+              <div class="lead-card-header">
+                <span class="lead-card-name">Ana Santos Oliveira</span>
+                <span class="lead-card-origin">Tráfego</span>
+              </div>
+              <div class="lead-card-entry-date">
+                <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18M8 2v4M16 2v4"/></svg>
+                Entrada: 10/06/2026
+              </div>
+              <div class="lead-card-product">Crédito Pessoal</div>
+              <div class="lead-card-value">R$ 15.000</div>
+              <div class="lead-card-footer">
+                <span class="lead-card-date">Finalizado: 24/06/2026</span>
+                <div class="lead-card-whatsapp">
+                  <svg viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+                </div>
+              </div>
+            </a>
+            <a href="lead-detail.html" class="lead-card">
+              <div class="lead-card-header">
+                <span class="lead-card-name">Roberto Costa Mendes</span>
+                <span class="lead-card-origin">Instagram</span>
+              </div>
+              <div class="lead-card-entry-date">
+                <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18M8 2v4M16 2v4"/></svg>
+                Entrada: 08/06/2026
+              </div>
+              <div class="lead-card-product">Antecipação FGTS</div>
+              <div class="lead-card-value">R$ 8.500</div>
+              <div class="lead-card-footer">
+                <span class="lead-card-date">Finalizado: 23/06/2026</span>
+                <div class="lead-card-whatsapp">
+                  <svg viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+                </div>
+              </div>
+            </a>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    // Filter buttons interaction
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+      });
+    });
+
+    // Drag and drop (basic visual feedback)
+    document.querySelectorAll('.lead-card').forEach(card => {
+      card.setAttribute('draggable', 'true');
+      card.addEventListener('dragstart', e => {
+        card.style.opacity = '0.5';
+        e.dataTransfer.setData('text/plain', '');
+      });
+      card.addEventListener('dragend', () => {
+        card.style.opacity = '1';
+      });
+    });
+
+    document.querySelectorAll('.column-body').forEach(column => {
+      column.addEventListener('dragover', e => {
+        e.preventDefault();
+        column.style.background = 'rgba(37,211,102,0.05)';
+      });
+      column.addEventListener('dragleave', () => {
+        column.style.background = '';
+      });
+      column.addEventListener('drop', e => {
+        e.preventDefault();
+        column.style.background = '';
+      });
+    });
+  </script>
+  <script src="auth.js"></script>
+</body>
+</html>
