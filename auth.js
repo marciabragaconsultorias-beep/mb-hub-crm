@@ -51,28 +51,9 @@ class AuthSystem {
       nome: 'Márcia Braga',
       email: 'marciabraga.consultorias@gmail.com',
       role: 'administrador',
-      avatar: 'MB'
-    },
-    'usuario1@mbsolucoes.com.br': {
-      id: 2,
-      nome: 'Usuário 1',
-      email: 'usuario1@mbsolucoes.com.br',
-      role: 'usuario',
-      avatar: 'U1'
-    },
-    'usuario2@mbsolucoes.com.br': {
-      id: 3,
-      nome: 'Usuário 2',
-      email: 'usuario2@mbsolucoes.com.br',
-      role: 'usuario',
-      avatar: 'U2'
-    },
-    'usuario3@mbsolucoes.com.br': {
-      id: 4,
-      nome: 'Usuário 3',
-      email: 'usuario3@mbsolucoes.com.br',
-      role: 'usuario',
-      avatar: 'U3'
+      tipo: 'admin',
+      avatar: 'MB',
+      ativo: true
     }
   };
 

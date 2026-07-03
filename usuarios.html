@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Usuários - MB Hub</title>
+  <style>
+    :root {
+      --bg: #ffffff;
+      --surface: #f8f9fa;
+      --fg: #1a1a1a;
+      --muted: #6b7280;
+      --border: #e5e7eb;
+      --accent: #ca8c3f;
+      --accent-secondary: #141352;
+      --radius: 8px;
+      --success: #10b981;
+      --danger: #ef4444;
+      --warning: #f59e0b;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: system-ui, -apple-system, sans-serif; background: var(--surface); color: var(--fg); line-height: 1.5; }
+    .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+    .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+    .header h1 { font-size: 28px; }
+    .btn { padding: 10px 20px; border: none; border-radius: var(--radius); cursor: pointer; font-size: 14px; font-weight: 500; }
+    .btn-primary { background: var(--accent); color: white; }
+    .btn-primary:hover { opacity: 0.9; }
+    .btn-danger { background: var(--danger); color: white; }
+    .btn-danger:hover { opacity: 0.9; }
+    .btn-sm { padding: 6px 12px; font-size: 12px; }
+    .table-responsive { overflow-x: auto; background: white; border-radius: var(--radius); border: 1px solid var(--border); }
+    table { width: 100%; border-collapse: collapse; }
+    th { background: var(--accent); color: white; padding: 12px; text-align: left; }
+    td { padding: 12px; border-bottom: 1px solid var(--border); }
+    tr:hover { background: var(--surface); }
+    .badge { display: inline-block; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 500; }
+    .badge-admin { background: #dbeafe; color: #1e40af; }
+    .badge-usuario { background: #dcfce7; color: #166534; }
+    .badge-parceiro { background: #fef3c7; color: #92400e; }
+    .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; }
+    .modal.active { display: flex; }
+    .modal-content { background: white; padding: 30px; border-radius: var(--radius); max-width: 500px; width: 90%; }
+    .form-group { margin-bottom: 20px; }
+    .form-label { display: block; margin-bottom: 8px; font-weight: 500; }
+    .form-input, .form-select { width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: var(--radius); font-size: 14px; }
+    .form-input:focus, .form-select:focus { outline: none; border-color: var(--accent); }
+    .checkbox-group { display: flex; align-items: center; gap: 8px; }
+    .checkbox-group input[type="checkbox"] { width: 18px; height: 18px; }
+    .actions { display: flex; gap: 8px; }
+    .alert { padding: 12px 16px; border-radius: var(--radius); margin-bottom: 20px; }
+    .alert-success { background: #d1fae5; color: #065f46; }
+    .alert-danger { background: #fee2e2; color: #7f1d1d; }
+    @media (max-width: 768px) {
+      .header { flex-direction: column; gap: 20px; align-items: flex-start; }
+      table { font-size: 12px; }
+      td, th { padding: 8px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>👥 Gerenciar Usuários</h1>
+      <button class="btn btn-primary" onclick="abrirModal('novo')">+ Novo Usuário</button>
+    </div>
+
+    <div id="alertaContainer"></div>
+
+    <div class="table-responsive">
+      <table>
+        <thead>
+          <tr>
+            <th>Nome</th>
+            <th>Email</th>
+            <th>Tipo</th>
+            <th>Status</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody id="tabelaUsuarios"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Modal Novo/Editar Usuário -->
+  <div class="modal" id="modalUsuario">
+    <div class="modal-content">
+      <h2 id="modalTitulo">Novo Usuário</h2>
+      <form id="formUsuario" style="margin-top: 20px;">
+        <div class="form-group">
+          <label class="form-label">Nome</label>
+          <input type="text" id="inputNome" class="form-input" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Email</label>
+          <input type="email" id="inputEmail" class="form-input" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Tipo de Usuário</label>
+          <select id="inputTipo" class="form-select" required>
+            <option value="admin">Administrador</option>
+            <option value="usuario">Usuário Interno (Funcionário)</option>
+            <option value="parceiro">Parceiro Externo</option>
+          </select>
+        </div>
+        <div class="checkbox-group">
+          <input type="checkbox" id="inputAtivo" checked>
+          <label for="inputAtivo">Usuário Ativo</label>
+        </div>
+        <div style="display: flex; gap: 10px; margin-top: 30px;">
+          <button type="submit" class="btn btn-primary" style="flex: 1;">Salvar</button>
+          <button type="button" class="btn" style="flex: 1; background: var(--border); color: var(--fg);" onclick="fecharModal()">Cancelar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="auth.js"></script>
+  <script>
+    let usuarioEmEdicao = null;
+
+    function carregarUsuarios() {
+      const usuarios = Object.values(auth.users || {});
+      const tbody = document.getElementById('tabelaUsuarios');
+      tbody.innerHTML = '';
+
+      usuarios.forEach(user => {
+        const tipoLabel = user.tipo === 'admin' ? 'Administrador' :
+                          user.tipo === 'usuario' ? 'Usuário Interno' : 'Parceiro Externo';
+        const tipoBadge = user.tipo === 'admin' ? 'badge-admin' :
+                          user.tipo === 'usuario' ? 'badge-usuario' : 'badge-parceiro';
+        const statusTexto = user.ativo !== false ? 'Ativo' : 'Inativo';
+        const statusBadge = user.ativo !== false ? 'badge-admin' : 'badge-danger';
+
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td><strong>${user.nome}</strong></td>
+          <td>${user.email}</td>
+          <td><span class="badge ${tipoBadge}">${tipoLabel}</span></td>
+          <td><span class="badge ${statusBadge}">${statusTexto}</span></td>
+          <td>
+            <div class="actions">
+              <button class="btn btn-sm" style="background: var(--accent); color: white;" onclick="editarUsuario('${user.email}')">Editar</button>
+              <button class="btn btn-sm btn-danger" onclick="deletarUsuario('${user.email}')">Deletar</button>
+            </div>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function abrirModal(modo, email = null) {
+      const modal = document.getElementById('modalUsuario');
+      const form = document.getElementById('formUsuario');
+
+      if (modo === 'novo') {
+        document.getElementById('modalTitulo').textContent = 'Novo Usuário';
+        form.reset();
+        usuarioEmEdicao = null;
+      } else if (modo === 'editar' && email) {
+        const user = auth.users[email];
+        document.getElementById('modalTitulo').textContent = 'Editar Usuário';
+        document.getElementById('inputNome').value = user.nome;
+        document.getElementById('inputEmail').value = user.email;
+        document.getElementById('inputTipo').value = user.tipo || 'usuario';
+        document.getElementById('inputAtivo').checked = user.ativo !== false;
+        usuarioEmEdicao = email;
+      }
+
+      modal.classList.add('active');
+    }
+
+    function fecharModal() {
+      document.getElementById('modalUsuario').classList.remove('active');
+    }
+
+    function editarUsuario(email) {
+      abrirModal('editar', email);
+    }
+
+    function deletarUsuario(email) {
+      if (email === 'marciabraga.consultorias@gmail.com') {
+        alert('❌ Não é permitido deletar o administrador principal.');
+        return;
+      }
+      if (confirm(`Tem certeza que deseja deletar o usuário ${email}?`)) {
+        delete auth.users[email];
+        auth.saveUsers();
+        carregarUsuarios();
+        mostrarAlerta('✅ Usuário deletado com sucesso!', 'success');
+      }
+    }
+
+    function mostrarAlerta(mensagem, tipo) {
+      const container = document.getElementById('alertaContainer');
+      const alerta = document.createElement('div');
+      alerta.className = `alert alert-${tipo}`;
+      alerta.textContent = mensagem;
+      container.innerHTML = '';
+      container.appendChild(alerta);
+      setTimeout(() => alerta.remove(), 3000);
+    }
+
+    document.getElementById('formUsuario').addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      const nome = document.getElementById('inputNome').value;
+      const email = document.getElementById('inputEmail').value;
+      const tipo = document.getElementById('inputTipo').value;
+      const ativo = document.getElementById('inputAtivo').checked;
+
+      if (usuarioEmEdicao) {
+        // Editar
+        if (usuarioEmEdicao !== email && auth.users[email]) {
+          mostrarAlerta('❌ Email já existe!', 'danger');
+          return;
+        }
+        delete auth.users[usuarioEmEdicao];
+      } else {
+        // Novo
+        if (auth.users[email]) {
+          mostrarAlerta('❌ Email já existe!', 'danger');
+          return;
+        }
+      }
+
+      auth.users[email] = {
+        id: Date.now(),
+        nome,
+        email,
+        tipo,
+        ativo,
+        avatar: nome.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)
+      };
+
+      auth.saveUsers();
+      fecharModal();
+      carregarUsuarios();
+      mostrarAlerta('✅ Usuário salvo com sucesso!', 'success');
+    });
+
+    // Carregar ao abrir
+    carregarUsuarios();
+  </script>
+</body>
+</html>
