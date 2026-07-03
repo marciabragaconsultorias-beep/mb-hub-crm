@@ -245,16 +245,44 @@
       e.preventDefault();
 
       const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      const adminEmail = 'marciabraga.consultorias@gmail.com';
+
+      // Validar email
+      if (email !== adminEmail) {
+        alert('❌ Email não autorizado. Use: marciabraga.consultorias@gmail.com');
+        return;
+      }
+
+      // Validar senha (deve ter pelo menos 6 caracteres)
+      if (!password || password.length < 6) {
+        alert('❌ Senha inválida. Deve ter pelo menos 6 caracteres.');
+        return;
+      }
+
+      // Salvar no localStorage
+      localStorage.setItem('mb_hub_user_email', email);
+      localStorage.setItem('mb_hub_user_password', password);
+
       const jaConcluiuOnboarding = localStorage.getItem('mb_hub_onboarding_concluido');
 
-      // Salvar email do usuário logado (necessário para onboarding)
-      localStorage.setItem('mb_hub_user_email', email);
-
-      // Se é primeira login, redirecionar para onboarding
+      // Redirecionar
       if (!jaConcluiuOnboarding) {
         window.location.href = 'onboarding.html';
       } else {
         window.location.href = 'dashboard.html';
+      }
+    });
+
+    // Link "Esqueceu a senha?"
+    document.querySelector('.forgot-link').addEventListener('click', function(e) {
+      e.preventDefault();
+      const newPassword = prompt('Digite uma nova senha (mínimo 6 caracteres):');
+      if (newPassword && newPassword.length >= 6) {
+        localStorage.setItem('mb_hub_user_password', newPassword);
+        alert('✅ Senha alterada com sucesso! Faça login novamente.');
+      } else if (newPassword) {
+        alert('❌ Senha deve ter pelo menos 6 caracteres.');
       }
     });
   </script>
